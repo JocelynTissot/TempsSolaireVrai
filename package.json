@@ -1,0 +1,21 @@
+{
+    "author": "jocelyntissot@gmail.com",
+    "dependencies": {},
+    "keywords": [],
+    "name": "tempssolairevrai",
+    "pebble": {
+        "displayName": "TempsSolaireVrai",
+        "enableMultiJS": true,
+        "messageKeys": [],
+        "projectType": "native",
+        "resources": {
+            "media": []
+        },
+        "sdkVersion": "3",
+        "uuid": "7469a511-a2f8-4d62-9a01-d28f84f24378",
+        "watchapp": {
+            "watchface": false
+        }
+    },
+    "version": "1.0.0"
+}
