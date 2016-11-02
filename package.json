@@ -4,17 +4,31 @@
     "keywords": [],
     "name": "tempssolairevrai",
     "pebble": {
+        "capabilities": [
+            "location"
+        ],
         "displayName": "TempsSolaireVrai",
-        "enableMultiJS": true,
-        "messageKeys": [],
+        "enableMultiJS": false,
+        "messageKeys": {
+            "corr_eot": 45,
+            "latitude": 1,
+            "longitude": 2,
+            "time_zone": 43,
+            "timezoneOffset": 42
+        },
         "projectType": "native",
         "resources": {
             "media": []
         },
         "sdkVersion": "3",
+        "targetPlatforms": [
+            "basalt",
+            "diorite",
+            "emery"
+        ],
         "uuid": "7469a511-a2f8-4d62-9a01-d28f84f24378",
         "watchapp": {
-            "watchface": false
+            "watchface": true
         }
     },
     "version": "1.0.0"
