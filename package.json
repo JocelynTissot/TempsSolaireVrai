@@ -11,7 +11,6 @@
         "enableMultiJS": false,
         "messageKeys": {
             "corr_eot": 45,
-            "latitude": 1,
             "longitude": 2,
             "time_zone": 43,
             "timezoneOffset": 42
