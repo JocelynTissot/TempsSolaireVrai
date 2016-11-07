@@ -69,13 +69,13 @@ function time_Zone(){
 }
 
 function sendToWatch() {
-        //corr_eotd = correction_eot();
-        console.log("  latitude = " + latitude);
+        corr_eotd = correction_eot();
+        //console.log("  latitude = " + latitude);
         console.log("  longitude = " + longitude);
       /*if (Math.abs(latitude - lastLatitude) > 0.0001 || Math.abs(longitude - lastLongitude) > 0.0001) { */
       Pebble.sendAppMessage( 
       { 
-         "latitude"       : latitude * 1000000,
+         //"latitude"       : latitude * 1000000,
          "longitude"      : longitude * 1000000,
          "timezoneOffset" : offsetTZ,
          "time_zone"      : timeZone,

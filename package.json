@@ -11,7 +11,6 @@
         "enableMultiJS": false,
         "messageKeys": {
             "corr_eot": 45,
-            "latitude": 1,
             "longitude": 2,
             "time_zone": 43,
             "timezoneOffset": 42
@@ -23,8 +22,7 @@
         "sdkVersion": "3",
         "targetPlatforms": [
             "basalt",
-            "diorite",
-            "emery"
+            "diorite"
         ],
         "uuid": "7469a511-a2f8-4d62-9a01-d28f84f24378",
         "watchapp": {

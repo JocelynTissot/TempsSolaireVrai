@@ -48,50 +48,57 @@ static void eot();
 static void long_dif();
 static void solar_time();
 
-static void handle_battery(BatteryChargeState charge_state) {
+static void handle_battery(BatteryChargeState charge_state) 
+{
   static char battery_text[] = "charge";
-#if defined(PBL_SDK_3)
-  if (charge_state.is_charging) {
+#ifdef PBL_COLOR
+  if (charge_state.is_charging) 
+	{
     snprintf(battery_text, sizeof(battery_text), "charge");
     text_layer_set_text_color(s_text_battery_layer, GColorGreen);
     text_layer_set_text_color(s_battery_layer, GColorGreen); 
-  } else {
-    if (charge_state.charge_percent < 20){
+  } else 
+	{
+    if (charge_state.charge_percent < 20)
+		{
       text_layer_set_text_color(s_text_battery_layer, GColorRed);
       text_layer_set_text_color(s_battery_layer, GColorRed);  
     }
-    else{
+    else
+		{
       text_layer_set_text_color(s_text_battery_layer, GColorWhite);
       text_layer_set_text_color(s_battery_layer, GColorWhite); 
     }
     snprintf(battery_text, sizeof(battery_text), "%d%%", charge_state.charge_percent);
   }
-#elif defined(PBL_SDK_2)
-   if (charge_state.is_charging) {
-    snprintf(battery_text, sizeof(battery_text), "charge");
-  } 
-  else {
+#else
+   if (charge_state.is_charging) 
+	 	{
+    	snprintf(battery_text, sizeof(battery_text), "charge");
+  	} 
+  else 
+	{
     snprintf(battery_text, sizeof(battery_text), "%d%%", charge_state.charge_percent);
-    }
+  }
     text_layer_set_text_color(s_text_battery_layer, GColorWhite);
     text_layer_set_text_color(s_battery_layer, GColorWhite); 
 #endif
   text_layer_set_text(s_battery_layer, battery_text);
 }
 
-static void send_request(int command) {
-  Tuplet command_tuple = TupletInteger(0 /*KEY_COMMAND*/ , command);
-  Tuplet index_tuple = TupletInteger(1 /*KEY_INDEX*/, 0 /*entryIndex*/);
-  DictionaryIterator *iter;
-  app_message_outbox_begin(&iter);
-  if (iter == NULL)
-     return;
+//static void send_request(int command) {
+//  Tuplet command_tuple = TupletInteger(0 /*KEY_COMMAND*/ , command);
+//  Tuplet index_tuple = TupletInteger(1 /*KEY_INDEX*/, 0 /*entryIndex*/);
+//  DictionaryIterator *iter;
+//  app_message_outbox_begin(&iter);
+//  if (iter == NULL)
+//     return;
     
-  dict_write_tuplet(iter, &command_tuple);
-  dict_write_tuplet(iter, &index_tuple);
-  dict_write_end(iter);
-  app_message_outbox_send();
-}
+//  dict_write_tuplet(iter, &command_tuple);
+//  dict_write_tuplet(iter, &index_tuple);
+//  dict_write_end(iter);
+//  app_message_outbox_send();
+//}
 
 static void affichage(){
   
@@ -172,16 +179,16 @@ static void update_time() {
   // Get a tm structure
   clock_time_t = time(NULL);
   clock_time_tm = *localtime(&clock_time_t);
-  #if defined(PBL_SDK_3)
+  //#if defined(PBL_SDK_3)
   utc_time_t  = clock_time_t;
-  #elif defined(PBL_SDK_2)
-  utc_time_t  = clock_time_t + timezoneOffset; 
-  #endif
-  #if defined(PBL_SDK_3)
+  //#elif defined(PBL_SDK_2)
+  //utc_time_t  = clock_time_t + timezoneOffset; 
+  //#endif
+  //#if defined(PBL_SDK_3)
   utc_time_tm = *gmtime(&utc_time_t);  
-  #elif defined(PBL_SDK_2)
-  utc_time_tm = *localtime(&utc_time_t);
-  #endif
+  //#elif defined(PBL_SDK_2)
+  //utc_time_tm = *localtime(&utc_time_t);
+  //#endif
   eot();
   long_dif();
   solar_time();
@@ -205,7 +212,7 @@ static void update_time() {
   posAJour = ((clock_time_t / 3600.0) - (lastTime / 60.0));
   //posAJour = ((clock_time_t / 60)-(lastTime));
   //posAJour = 2; // test
-  #if defined(PBL_SDK_3)
+  #ifdef PBL_COLOR
   if (posAJour > 4)/*(posAJour > (INTERV_MAJ_DONNEE / 60) - (INTERV_MAJ_DONNEE_APRES_ECHEC / 60))*/
   {
     text_layer_set_text_color(s_text_posAJour_layer, GColorRed);
@@ -213,7 +220,7 @@ static void update_time() {
   else{
     text_layer_set_text_color(s_text_posAJour_layer, GColorWhite);
     text_layer_set_text_color(s_posAJour_layer, GColorWhite);}
-  #elif defined(PBL_SDK_2)
+  #else
     text_layer_set_text_color(s_text_posAJour_layer, GColorWhite);
     text_layer_set_text_color(s_posAJour_layer, GColorWhite);
   #endif
@@ -462,9 +469,9 @@ static void main_window_load(Window *window) {
   // Create date TextLayer
   s_date_layer = text_layer_create(GRect(0, -2, 144, 24));
   text_layer_set_background_color(s_date_layer, GColorClear);
-  #if defined(PBL_SDK_3)
+  #ifdef PBL_COLOR
   text_layer_set_text_color(s_date_layer, GColorCadetBlue);
-  #elif defined(PBL_SDK_2)
+  #else
   text_layer_set_text_color(s_date_layer, GColorWhite);
   #endif
   text_layer_set_text(s_date_layer, "--.--.----");
@@ -478,9 +485,9 @@ static void main_window_load(Window *window) {
   // Create gmtime TextLayer
   s_gmtime_layer = text_layer_create(GRect(0, 46, 144, 18));
   text_layer_set_background_color(s_gmtime_layer, GColorClear);
-  #if defined(PBL_SDK_3)
+  #ifdef PBL_COLOR
   text_layer_set_text_color(s_gmtime_layer, GColorCadetBlue);
-  #elif defined(PBL_SDK_2)
+  #else
   text_layer_set_text_color(s_gmtime_layer, GColorWhite);
   #endif
   text_layer_set_text(s_gmtime_layer, "GMT  --:--");
@@ -488,9 +495,9 @@ static void main_window_load(Window *window) {
   // Create solar_text TextLayer
   s_text_solar_layer = text_layer_create(GRect(0, 56, 144, 20));
   text_layer_set_background_color(s_text_solar_layer, GColorClear);
-  #if defined(PBL_SDK_3)
+  #ifdef PBL_COLOR
   text_layer_set_text_color(s_text_solar_layer, GColorYellow);
-  #elif defined(PBL_SDK_2)
+  #else
   text_layer_set_text_color(s_text_solar_layer, GColorWhite);
   #endif
   text_layer_set_text(s_text_solar_layer, "Temps solaire vrai");
@@ -498,9 +505,9 @@ static void main_window_load(Window *window) {
   // Create solar TextLayer
   s_solar_layer = text_layer_create(GRect(0, 68, 144, 24));
   text_layer_set_background_color(s_solar_layer, GColorClear);
-  #if defined(PBL_SDK_3)
+  #ifdef PBL_COLOR
   text_layer_set_text_color(s_solar_layer, GColorYellow);
-  #elif defined(PBL_SDK_2)
+  #else
   text_layer_set_text_color(s_solar_layer, GColorWhite);
   #endif
   text_layer_set_text(s_solar_layer, "--:--");
@@ -508,9 +515,9 @@ static void main_window_load(Window *window) {
   // Create text_longitude_difference TextLayer
   s_text_longitude_difference_layer = text_layer_create(GRect(0, 90, 144, 21));
   text_layer_set_background_color(s_text_longitude_difference_layer, GColorClear);
-  #if defined(PBL_SDK_3)
+  #ifdef PBL_COLOR
   text_layer_set_text_color(s_text_longitude_difference_layer, GColorGreen);
-  #elif defined(PBL_SDK_2)
+  #else
   text_layer_set_text_color(s_text_longitude_difference_layer, GColorWhite);
   #endif
   text_layer_set_text(s_text_longitude_difference_layer, "Différence de long.");
@@ -518,9 +525,9 @@ static void main_window_load(Window *window) {
   // Create longitude_difference_h TextLayer
   s_longitude_difference_h_layer = text_layer_create(GRect(-2, 108, 77, 18));
   text_layer_set_background_color(s_longitude_difference_h_layer, GColorClear);
-  #if defined(PBL_SDK_3)
+  #ifdef PBL_COLOR
   text_layer_set_text_color(s_longitude_difference_h_layer, GColorGreen);
-  #elif defined(PBL_SDK_2)
+  #else
   text_layer_set_text_color(s_longitude_difference_h_layer, GColorWhite);
   #endif
   text_layer_set_text(s_longitude_difference_h_layer, "---h --m --s");
@@ -528,9 +535,9 @@ static void main_window_load(Window *window) {
   // Create longitude_difference_d TextLayer
   s_longitude_difference_d_layer = text_layer_create(GRect(70, 108, 77, 18));
   text_layer_set_background_color(s_longitude_difference_d_layer, GColorClear);
-  #if defined(PBL_SDK_3)
+  #ifdef PBL_COLOR
   text_layer_set_text_color(s_longitude_difference_d_layer, GColorGreen);
-  #elif defined(PBL_SDK_2)
+  #else
   text_layer_set_text_color(s_longitude_difference_d_layer, GColorWhite);
   #endif
   text_layer_set_text(s_longitude_difference_d_layer, "---° --m --s");
@@ -538,9 +545,9 @@ static void main_window_load(Window *window) {
   // Create text_eot TextLayer
   s_text_eot_layer = text_layer_create(GRect(0, 126, 144, 20));
   text_layer_set_background_color(s_text_eot_layer, GColorClear);
-  #if defined(PBL_SDK_3)
+  #ifdef PBL_COLOR
   text_layer_set_text_color(s_text_eot_layer, GColorBrilliantRose);
-  #elif defined(PBL_SDK_2)
+  #else
   text_layer_set_text_color(s_text_eot_layer, GColorWhite);
   #endif
   text_layer_set_text(s_text_eot_layer, "Equation du temps");
@@ -548,9 +555,9 @@ static void main_window_load(Window *window) {
   // Create eot TextLayer
   s_eot_layer = text_layer_create(GRect(25, 144, 94, 18));
   text_layer_set_background_color(s_eot_layer, GColorClear);
-  #if defined(PBL_SDK_3)
+  #ifdef PBL_COLOR
   text_layer_set_text_color(s_eot_layer, GColorBrilliantRose);
-  #elif defined(PBL_SDK_2)
+  #else
   text_layer_set_text_color(s_eot_layer, GColorWhite);
   #endif
   text_layer_set_text(s_eot_layer, "---m --s");
