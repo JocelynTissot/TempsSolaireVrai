@@ -693,8 +693,9 @@ static void init() {
   app_message_register_outbox_sent(out_sent_handler);
   app_message_register_outbox_failed(out_failed_handler);
   
-  app_message_open(app_message_inbox_size_maximum(),app_message_outbox_size_maximum());
-  
+  //app_message_open(app_message_inbox_size_maximum(),app_message_outbox_size_maximum());
+  app_message_open(64, 64);
+	
   // Create main Window element and assign to pointer
   s_main_window = window_create();
 
