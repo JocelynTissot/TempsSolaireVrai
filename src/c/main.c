@@ -13,7 +13,7 @@ static TextLayer *s_eot_layer;
 static TextLayer *s_text_longitude_difference_layer;
 static TextLayer *s_longitude_difference_h_layer;
 static TextLayer *s_longitude_difference_d_layer;
-static TextLayer *s_text_battery_layer;
+//static TextLayer *s_text_battery_layer;
 static TextLayer *s_battery_layer;
 static TextLayer *s_text_posAJour_layer;
 static TextLayer *s_posAJour_layer;
@@ -50,41 +50,86 @@ static void solar_time();
 
 static void handle_battery(BatteryChargeState charge_state) 
 {
-  static char battery_text[] = "charge";
+  static char battery_text[] = "|:->:þ";
 #ifdef PBL_COLOR
   if (charge_state.is_charging) 
 	{
-    snprintf(battery_text, sizeof(battery_text), "charge");
-    text_layer_set_text_color(s_text_battery_layer, GColorGreen);
-    text_layer_set_text_color(s_battery_layer, GColorGreen); 
+    snprintf(battery_text, sizeof(battery_text), "|:->:þ");
+    //text_layer_set_text_color(s_text_battery_layer, GColorYellow);
+    text_layer_set_text_color(s_battery_layer, GColorYellow); 
   } else 
-	{
-    if (charge_state.charge_percent < 20)
 		{
-      text_layer_set_text_color(s_text_battery_layer, GColorRed);
-      text_layer_set_text_color(s_battery_layer, GColorRed);  
-    }
-    else
-		{
-      text_layer_set_text_color(s_text_battery_layer, GColorWhite);
-      text_layer_set_text_color(s_battery_layer, GColorWhite); 
-    }
-    snprintf(battery_text, sizeof(battery_text), "%d%%", charge_state.charge_percent);
+    	if (charge_state.charge_percent < 20)
+			{
+      	//text_layer_set_text_color(s_text_battery_layer, GColorRed);
+      	text_layer_set_text_color(s_battery_layer, GColorRed);  
+    	}
+    	else if (charge_state.charge_percent < 50 && charge_state.charge_percent >= 20)
+			{
+      	//text_layer_set_text_color(s_text_battery_layer, GColorWhite);
+      	text_layer_set_text_color(s_battery_layer, GColorWhite); 
+    	}
+			else
+			{
+				//text_layer_set_text_color(s_text_battery_layer, GColorGreen);
+    		text_layer_set_text_color(s_battery_layer, GColorGreen); 
+			}
+		if (charge_state.charge_percent < 20)
+			{
+				snprintf(battery_text, sizeof(battery_text), "|::::þ");
+			}
+		else if (charge_state.charge_percent < 40 && charge_state.charge_percent >= 20)
+			{
+				snprintf(battery_text, sizeof(battery_text), "||:::þ");
+			}
+		else if (charge_state.charge_percent < 60 && charge_state.charge_percent >= 40)
+			{
+				snprintf(battery_text, sizeof(battery_text), "|||::þ");
+			}
+		else if (charge_state.charge_percent < 80 && charge_state.charge_percent >= 60)
+			{
+				snprintf(battery_text, sizeof(battery_text), "||||:þ");
+			}
+		else
+			{
+				snprintf(battery_text, sizeof(battery_text), "|||||þ");
+			}
+    //snprintf(battery_text, sizeof(battery_text), "%d%%", charge_state.charge_percent);
   }
 #else
-   if (charge_state.is_charging) 
-	 	{
-    	snprintf(battery_text, sizeof(battery_text), "charge");
-  	} 
-  else 
+ if (charge_state.is_charging) 
 	{
-    snprintf(battery_text, sizeof(battery_text), "%d%%", charge_state.charge_percent);
-  }
-    text_layer_set_text_color(s_text_battery_layer, GColorWhite);
-    text_layer_set_text_color(s_battery_layer, GColorWhite); 
+  	snprintf(battery_text, sizeof(battery_text), "|:->:þ");
+	} 
+else 
+  {
+				if (charge_state.charge_percent < 20)
+			{
+				snprintf(battery_text, sizeof(battery_text), "|::::þ");
+			}
+		else if (charge_state.charge_percent < 40 && charge_state.charge_percent >= 20)
+			{
+				snprintf(battery_text, sizeof(battery_text), "||:::þ");
+			}
+		else if (charge_state.charge_percent < 60 && charge_state.charge_percent >= 40)
+			{
+				snprintf(battery_text, sizeof(battery_text), "|||::þ");
+			}
+		else if (charge_state.charge_percent < 80 && charge_state.charge_percent >= 60)
+			{
+				snprintf(battery_text, sizeof(battery_text), "||||:þ");
+			}
+		else
+			{
+				snprintf(battery_text, sizeof(battery_text), "|||||þ");
+			}
+  	//snprintf(battery_text, sizeof(battery_text), "%d%%", charge_state.charge_percent);
+	}
+  	//text_layer_set_text_color(s_text_battery_layer, GColorWhite);
+ 		text_layer_set_text_color(s_battery_layer, GColorWhite); 
 #endif
-  text_layer_set_text(s_battery_layer, battery_text);
-}
+  	text_layer_set_text(s_battery_layer, battery_text);
+	}
 
 //static void send_request(int command) {
 //  Tuplet command_tuple = TupletInteger(0 /*KEY_COMMAND*/ , command);
@@ -113,7 +158,7 @@ static void affichage(){
   static char buffer_text_longitude_difference[] = "Différence de long.";
   static char buffer_longitude_difference_h[] = "---h--m--s";
   static char buffer_longitude_difference_d[] = "---°--'--";
-  static char buffer_text_battery[] = "Bat.";
+  //static char buffer_text_battery[] = "Bat.";
   static char buffer_text_posAJour[] = "Pos.\nM.àJ.";
   static char buffer_posAJour[] = "+ -h";
 
@@ -151,7 +196,7 @@ static void affichage(){
     {
     snprintf(buffer_eot, sizeof("000:000X"), "%dm %ds", eotMinInt , eotSecInt);
   }
-  snprintf(buffer_text_battery, sizeof("Bat."), "Bat.");
+  //snprintf(buffer_text_battery, sizeof("Bat."), "Bat.");
   snprintf(buffer_text_posAJour, sizeof("Pos.\nM.àJ."), "Pos.\nM.àJ.");
   if (posAJour > 9){
     snprintf(buffer_posAJour, sizeof("+ -h"), "+ 9h");}
@@ -170,7 +215,7 @@ static void affichage(){
   text_layer_set_text(s_longitude_difference_d_layer, buffer_longitude_difference_d);
   text_layer_set_text(s_text_eot_layer, buffer_text_eot);
   text_layer_set_text(s_eot_layer, buffer_eot);
-  text_layer_set_text(s_text_battery_layer, buffer_text_battery);
+  //text_layer_set_text(s_text_battery_layer, buffer_text_battery);
   text_layer_set_text(s_text_posAJour_layer, buffer_text_posAJour);
   text_layer_set_text(s_posAJour_layer, buffer_posAJour);
 }
@@ -563,16 +608,17 @@ static void main_window_load(Window *window) {
   text_layer_set_text(s_eot_layer, "---m --s");
   
   // Creat text_battery TextLayer
-  s_text_battery_layer = text_layer_create(GRect(0, 0, 144, 34));
+  //s_text_battery_layer = text_layer_create(GRect(0, 0, 144, 34));
   //text_layer_set_text_color(s_text_battery_layer, GColorWhite);
-  text_layer_set_background_color(s_text_battery_layer, GColorClear);
-  text_layer_set_text(s_text_battery_layer, "Bat.");
+  //text_layer_set_background_color(s_text_battery_layer, GColorClear);
+  //text_layer_set_text(s_text_battery_layer, "Bat.");
   
   // Creat battery TextLayer
-  s_battery_layer = text_layer_create(GRect(0, 14, 144, 34));
+  //s_battery_layer = text_layer_create(GRect(0, 14, 144, 34));
+	s_battery_layer = text_layer_create(GRect(0, 0, 144,34));
   //text_layer_set_text_color(s_battery_layer, GColorWhite);
   text_layer_set_background_color(s_battery_layer, GColorClear);
-  text_layer_set_text(s_battery_layer, "charge");
+  text_layer_set_text(s_battery_layer, "|»»»»þ");
   
   // Creat text_posAJour TextLayer
   s_text_posAJour_layer = text_layer_create(GRect(0, 0, 144, 34));
@@ -618,8 +664,8 @@ static void main_window_load(Window *window) {
   text_layer_set_font(s_eot_layer, fonts_get_system_font(FONT_KEY_GOTHIC_18_BOLD));
   text_layer_set_text_alignment(s_eot_layer, GTextAlignmentCenter);
   
-  text_layer_set_font(s_text_battery_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
-  text_layer_set_text_alignment(s_text_battery_layer, GTextAlignmentLeft);
+  //text_layer_set_font(s_text_battery_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
+  //text_layer_set_text_alignment(s_text_battery_layer, GTextAlignmentLeft);
   
   text_layer_set_font(s_battery_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
   text_layer_set_text_alignment(s_battery_layer, GTextAlignmentLeft);
@@ -641,7 +687,7 @@ static void main_window_load(Window *window) {
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_longitude_difference_d_layer));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_text_eot_layer));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_eot_layer));
-  layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_text_battery_layer));
+  //layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_text_battery_layer));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_battery_layer));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_text_posAJour_layer));
   layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_posAJour_layer));
@@ -665,7 +711,7 @@ static void main_window_unload(Window *window) {
   text_layer_destroy(s_longitude_difference_h_layer);
   text_layer_destroy(s_text_eot_layer);
   text_layer_destroy(s_eot_layer);
-  text_layer_destroy(s_text_battery_layer);
+  //text_layer_destroy(s_text_battery_layer);
   text_layer_destroy(s_battery_layer);
   text_layer_destroy(s_text_posAJour_layer);
   text_layer_destroy(s_posAJour_layer);
