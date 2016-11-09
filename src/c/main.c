@@ -74,19 +74,19 @@ static void handle_battery(BatteryChargeState charge_state)
 				//text_layer_set_text_color(s_text_battery_layer, GColorGreen);
     		text_layer_set_text_color(s_battery_layer, GColorGreen); 
 			}
-		if (charge_state.charge_percent < 20)
+		if (charge_state.charge_percent <= 20)
 			{
 				snprintf(battery_text, sizeof(battery_text), "|::::þ");
 			}
-		else if (charge_state.charge_percent < 40 && charge_state.charge_percent >= 20)
+		else if (charge_state.charge_percent <= 40 && charge_state.charge_percent > 20)
 			{
 				snprintf(battery_text, sizeof(battery_text), "||:::þ");
 			}
-		else if (charge_state.charge_percent < 60 && charge_state.charge_percent >= 40)
+		else if (charge_state.charge_percent <= 60 && charge_state.charge_percent > 40)
 			{
 				snprintf(battery_text, sizeof(battery_text), "|||::þ");
 			}
-		else if (charge_state.charge_percent < 80 && charge_state.charge_percent >= 60)
+		else if (charge_state.charge_percent <= 80 && charge_state.charge_percent > 60)
 			{
 				snprintf(battery_text, sizeof(battery_text), "||||:þ");
 			}
@@ -103,19 +103,19 @@ static void handle_battery(BatteryChargeState charge_state)
 	} 
 else 
   {
-				if (charge_state.charge_percent < 20)
+				if (charge_state.charge_percent <= 20)
 			{
 				snprintf(battery_text, sizeof(battery_text), "|::::þ");
 			}
-		else if (charge_state.charge_percent < 40 && charge_state.charge_percent >= 20)
+		else if (charge_state.charge_percent <= 40 && charge_state.charge_percent > 20)
 			{
 				snprintf(battery_text, sizeof(battery_text), "||:::þ");
 			}
-		else if (charge_state.charge_percent < 60 && charge_state.charge_percent >= 40)
+		else if (charge_state.charge_percent <= 60 && charge_state.charge_percent > 40)
 			{
 				snprintf(battery_text, sizeof(battery_text), "|||::þ");
 			}
-		else if (charge_state.charge_percent < 80 && charge_state.charge_percent >= 60)
+		else if (charge_state.charge_percent <= 80 && charge_state.charge_percent > 60)
 			{
 				snprintf(battery_text, sizeof(battery_text), "||||:þ");
 			}
