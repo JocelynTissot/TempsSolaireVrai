@@ -1,6 +1,7 @@
 #include <pebble.h>
 #include "main.h"
 #include "my_math.h"
+#include "cible_localisation.h"
 
 static Window    *s_main_window;
 static TextLayer *s_date_layer;
@@ -15,12 +16,14 @@ static TextLayer *s_longitude_difference_h_layer;
 static TextLayer *s_longitude_difference_d_layer;
 //static TextLayer *s_text_battery_layer;
 static TextLayer *s_battery_layer;
-static TextLayer *s_text_posAJour_layer;
-static TextLayer *s_posAJour_layer;
+//static TextLayer *s_text_posAJour_layer;
+//static TextLayer *s_posAJour_layer;
+static Layer 		 *s_dessin_layer;
 time_t clock_time_t = 0;
 time_t lastTime;
 time_t lastTime2;
 int posAJour;
+GColor couleur_cible_loc;
 time_t utc_time_t = 0;
 time_t solar_time_t = 0;
 int32_t corr_eotd_received;
@@ -145,8 +148,17 @@ static void handle_battery(BatteryChargeState charge_state)
 //  app_message_outbox_send();
 //}
 
-static void affichage(){
+static void dessin(Layer *layer, GContext *ctx) 
+{
+	int angle;
+	(posAJour < 2) ? (angle = 0) : (angle = posAJour * 30);
+	(posAJour > 12) ? (angle = 360) : (angle = posAJour * 30);
+	//cible_localisation(ctx,117, 2, posAJour * 30, couleur_cible_loc);
+	cible_localisation(ctx,118, 2, angle, couleur_cible_loc);
+}
 
+static void affichage()
+{
 	// Create a long-lived buffer
 	static char buffer_date[] = "jj.mm.aaaa";
 	static char buffer_t[] = "00:00";
@@ -159,8 +171,8 @@ static void affichage(){
 	static char buffer_longitude_difference_h[] = "---h--m--s";
 	static char buffer_longitude_difference_d[] = "---°--'--";
 	//static char buffer_text_battery[] = "Bat.";
-	static char buffer_text_posAJour[] = "Pos.\nM.àJ.";
-	static char buffer_posAJour[] = "+ -h";
+	//static char buffer_text_posAJour[] = "Pos.\nM.àJ.";
+	//static char buffer_posAJour[] = "+ -h";
 
 	// Write the current hours and minutes into the buffer
 	strftime(buffer_date, sizeof("jj.mm.aaaa"), "%e.%m.%y", &clock_time_tm);
@@ -169,22 +181,28 @@ static void affichage(){
 	snprintf(buffer_text_solar, sizeof("Temps solaire vrai"), "Temps solaire vrai");
 	strftime(buffer_solar, sizeof("XXXXxx 00:00"), "%k:%M", &solar_time_tm);
 	snprintf(buffer_text_longitude_difference, sizeof("Différence de long."), "Différence de long.");
-	if ((long_dif_h == 0) && (long_dif_hm == 0)){
+	if ((long_dif_h == 0) && (long_dif_hm == 0))
+	{
 		snprintf(buffer_longitude_difference_h, sizeof("SSs"), "%ds", long_dif_hs);
 	}
-	else if (long_dif_h == 0){
+	else if (long_dif_h == 0)
+	{
 		snprintf(buffer_longitude_difference_h, sizeof("MMm SSs"), "%dm %ds", long_dif_hm, long_dif_hs);
 	}
-	else {
+	else 
+	{
 		snprintf(buffer_longitude_difference_h, sizeof("XHHhMMmSSs"), "%dh%dm%ds", long_dif_h, long_dif_hm, long_dif_hs);
 	}
-	if ((long_dif_d == 0) && (long_dif_dm == 0)){
+	if ((long_dif_d == 0) && (long_dif_dm == 0))
+	{
 		snprintf(buffer_longitude_difference_d, sizeof("SSX"), "%d\"", long_dif_ds);
 	}
-	else if (long_dif_d == 0){
+	else if (long_dif_d == 0)
+	{
 		snprintf(buffer_longitude_difference_d, sizeof("MM' SSX"), "%d' %d\"", long_dif_dm, long_dif_ds);
 	}
-	else {
+	else 
+	{
 		snprintf(buffer_longitude_difference_d, sizeof("XDD°MM'SSX"), "%d°%d'%d\"", long_dif_d, long_dif_dm, long_dif_ds);
 	}
 	snprintf(buffer_text_eot, sizeof("Equation du temps"), "Equation du temps");
@@ -196,13 +214,17 @@ static void affichage(){
 	{
 		snprintf(buffer_eot, sizeof("000:000X"), "%dm %ds", eotMinInt , eotSecInt);
 	}
+	/*
 	//snprintf(buffer_text_battery, sizeof("Bat."), "Bat.");
 	snprintf(buffer_text_posAJour, sizeof("Pos.\nM.àJ."), "Pos.\nM.àJ.");
-	if (posAJour > 9){
-		snprintf(buffer_posAJour, sizeof("+ -h"), "+ 9h");}
-	else{
-		snprintf(buffer_posAJour, sizeof("+ -h"), "+ %dh", posAJour);
+	if (posAJour > 9)
+	{
+		snprintf(buffer_posAJour, sizeof("+ -h"), "+ 9h");
 	}
+	else
+	{
+		snprintf(buffer_posAJour, sizeof("+ -h"), "+ %dh", posAJour);
+	}*/
 
 	// Display this time on the TextLayer
 	text_layer_set_text(s_date_layer, buffer_date);
@@ -216,11 +238,12 @@ static void affichage(){
 	text_layer_set_text(s_text_eot_layer, buffer_text_eot);
 	text_layer_set_text(s_eot_layer, buffer_eot);
 	//text_layer_set_text(s_text_battery_layer, buffer_text_battery);
-	text_layer_set_text(s_text_posAJour_layer, buffer_text_posAJour);
-	text_layer_set_text(s_posAJour_layer, buffer_posAJour);
+	//text_layer_set_text(s_text_posAJour_layer, buffer_text_posAJour);
+	//text_layer_set_text(s_posAJour_layer, buffer_posAJour);
 }
 
-static void update_time() {
+static void update_time() 
+{
 	// Get a tm structure
 	clock_time_t = time(NULL);
 	clock_time_tm = *localtime(&clock_time_t);
@@ -241,45 +264,60 @@ static void update_time() {
 	//solar_time_tm = *localtime(&solar_time_t);
 	solar_time_tm = *gmtime (&solar_time_t);
 
-	if (solar_time_tm.tm_min >= 60) {
+	if (solar_time_tm.tm_min >= 60) 
+	{
 		solar_time_tm.tm_min -= 60;
 		solar_time_tm.tm_hour += 1;
 	}  
-	if (solar_time_tm.tm_hour == 24) {
+	if (solar_time_tm.tm_hour == 24) 
+	{
 		solar_time_tm.tm_hour = 0;
 	}
-	if (solar_time_tm.tm_hour > 24) {
+	if (solar_time_tm.tm_hour > 24) 
+	{
 		solar_time_tm.tm_hour = solar_time_tm.tm_hour - 24;
 	}
-	if (solar_time_tm.tm_hour < 0) {
+	if (solar_time_tm.tm_hour < 0)
+	{
 		solar_time_tm.tm_hour = solar_time_tm.tm_hour + 24;
 	}  
-	posAJour = ((clock_time_t / 3600.0) - (lastTime / 60.0));
+	posAJour = (int)((clock_time_t / 3600.0) - (lastTime / 60.0));
 	//posAJour = ((clock_time_t / 60)-(lastTime));
-	//posAJour = 2; // test
+	//posAJour = 8; // test
 #ifdef PBL_COLOR
-	if (posAJour > 4)/*(posAJour > (INTERV_MAJ_DONNEE / 60) - (INTERV_MAJ_DONNEE_APRES_ECHEC / 60))*/
+	if (posAJour >= 6)/*(posAJour > (INTERV_MAJ_DONNEE / 60) - (INTERV_MAJ_DONNEE_APRES_ECHEC / 60))*/
 	{
-		text_layer_set_text_color(s_text_posAJour_layer, GColorRed);
-		text_layer_set_text_color(s_posAJour_layer, GColorRed);}
-	else{
-		text_layer_set_text_color(s_text_posAJour_layer, GColorWhite);
-		text_layer_set_text_color(s_posAJour_layer, GColorWhite);}
+		//text_layer_set_text_color(s_text_posAJour_layer, GColorRed);
+		//text_layer_set_text_color(s_posAJour_layer, GColorRed);
+		couleur_cible_loc = GColorRed;
+	}
+	else if (posAJour < 6 && posAJour > 2)
+	{
+		//text_layer_set_text_color(s_text_posAJour_layer, GColorWhite);
+		//text_layer_set_text_color(s_posAJour_layer, GColorWhite);
+		couleur_cible_loc = GColorBlue;
+	}
+	else 
+	{
+		couleur_cible_loc = GColorGreen;
+	}
 #else
-	text_layer_set_text_color(s_text_posAJour_layer, GColorWhite);
-	text_layer_set_text_color(s_posAJour_layer, GColorWhite);
+	//text_layer_set_text_color(s_text_posAJour_layer, GColorWhite);
+	//text_layer_set_text_color(s_posAJour_layer, GColorWhite);
+	couleur_cible_loc = GColorWhite;
 #endif
 	/*
-	   if (((lastTime + (INTERV_MAJ_DONNEE)) < (clock_time_t / 60)) && ((lastTime2 + (INTERV_MAJ_DONNEE_APRES_ECHEC)) < (clock_time_t / 60))) 
-	   {   
-	//Vibreur
-	//vibes_double_pulse();
-	lastTime2 = (clock_time_t / 60);
-	send_request(0); // request data refresh from phone JS         
+	if (((lastTime + (INTERV_MAJ_DONNEE)) < (clock_time_t / 60)) && ((lastTime2 + (INTERV_MAJ_DONNEE_APRES_ECHEC)) < (clock_time_t / 60))) 
+	{   
+		//Vibreur
+		//vibes_double_pulse();
+		lastTime2 = (clock_time_t / 60);
+		send_request(0); // request data refresh from phone JS         
 	} 
 	*/
 	affichage();
 }
+
 
 /******************
   APPMESSAGE STUFF
@@ -509,7 +547,8 @@ static void solar_time(){
 	solar_time_t  = utc_time_t + time_zone - (eotd * 60.0) - (longitude_difference * 4.0 * 60.0);
 }
 
-static void main_window_load(Window *window) {
+static void main_window_load(Window *window) 
+{
 	window_set_background_color(s_main_window, GColorBlack);
 	// Create date TextLayer
 	s_date_layer = text_layer_create(GRect(0, -2, 144, 24));
@@ -621,16 +660,17 @@ static void main_window_load(Window *window) {
 	text_layer_set_text(s_battery_layer, "|»»»»þ");
 
 	// Creat text_posAJour TextLayer
-	s_text_posAJour_layer = text_layer_create(GRect(0, 0, 144, 34));
+	//s_text_posAJour_layer = text_layer_create(GRect(0, 0, 144, 34));
 	//text_layer_set_text_color(s_text_posAJour_layer, GColorWhite);
-	text_layer_set_background_color(s_text_posAJour_layer, GColorClear);
-	text_layer_set_text(s_text_posAJour_layer, "Pos.\nM.àJ.");
+	//text_layer_set_background_color(s_text_posAJour_layer, GColorClear);
+	//text_layer_set_text(s_text_posAJour_layer, "Pos.\nM.àJ.");
 
 	// Creat posAJour TextLayer
-	s_posAJour_layer = text_layer_create(GRect(0, 28, 144, 34));
+	/*s_posAJour_layer = text_layer_create(GRect(0, 28, 144, 34));
 	//text_layer_set_text_color(s_posAJour_layer, GColorWhite);
 	text_layer_set_background_color(s_posAJour_layer, GColorClear);
-	text_layer_set_text(s_posAJour_layer, "+ -h");
+	text_layer_set_text(s_posAJour_layer, "+ -h");*/
+	layer_set_update_proc(s_dessin_layer, dessin); 
 
 	// Improve the layout to be more like a watchface
 
@@ -670,11 +710,11 @@ static void main_window_load(Window *window) {
 	text_layer_set_font(s_battery_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
 	text_layer_set_text_alignment(s_battery_layer, GTextAlignmentLeft);
 
-	text_layer_set_font(s_text_posAJour_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
-	text_layer_set_text_alignment(s_text_posAJour_layer, GTextAlignmentRight);
-
+	//text_layer_set_font(s_text_posAJour_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
+	//text_layer_set_text_alignment(s_text_posAJour_layer, GTextAlignmentRight);
+/*
 	text_layer_set_font(s_posAJour_layer, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD));
-	text_layer_set_text_alignment(s_posAJour_layer, GTextAlignmentRight);
+	text_layer_set_text_alignment(s_posAJour_layer, GTextAlignmentRight);*/
 
 	// Add it as a child layer to the Window's root layer
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_date_layer));
@@ -689,8 +729,10 @@ static void main_window_load(Window *window) {
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_eot_layer));
 	//layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_text_battery_layer));
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_battery_layer));
-	layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_text_posAJour_layer));
-	layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_posAJour_layer));
+	//layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_text_posAJour_layer));
+	//layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_posAJour_layer));
+	layer_add_child(window_get_root_layer(window), s_dessin_layer);
+	
 	// Make sure the time is displayed from the start
 	handle_battery(battery_state_service_peek());
 }
@@ -713,8 +755,9 @@ static void main_window_unload(Window *window) {
 	text_layer_destroy(s_eot_layer);
 	//text_layer_destroy(s_text_battery_layer);
 	text_layer_destroy(s_battery_layer);
-	text_layer_destroy(s_text_posAJour_layer);
-	text_layer_destroy(s_posAJour_layer);
+	//text_layer_destroy(s_text_posAJour_layer);
+	//text_layer_destroy(s_posAJour_layer);
+	layer_destroy(s_dessin_layer);
 
 }
 
@@ -744,6 +787,10 @@ static void init() {
 
 	// Create main Window element and assign to pointer
 	s_main_window = window_create();
+	
+	GRect bounds = layer_get_bounds(window_get_root_layer(s_main_window));
+	
+	s_dessin_layer = layer_create(bounds);
 
 	// Set handlers to manage the elements inside the Window
 	window_set_window_handlers(s_main_window, (WindowHandlers) {
@@ -776,7 +823,8 @@ static void deinit() {
 	window_destroy(s_main_window);
 }
 
-int main(void) {
+int main(void) 
+{
 	init();
 	app_event_loop();
 	deinit();
