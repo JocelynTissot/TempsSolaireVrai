@@ -151,9 +151,7 @@ static void handle_battery(BatteryChargeState charge_state)
 static void dessin(Layer *layer, GContext *ctx) 
 {
 	int angle;
-	(posAJour < 2) ? (angle = 0) : (angle = posAJour * 30);
-	(posAJour > 12) ? (angle = 360) : (angle = posAJour * 30);
-	//cible_localisation(ctx,117, 2, posAJour * 30, couleur_cible_loc);
+	(posAJour < 2) ? (angle = 0) : ((posAJour > 12) ? (angle = 360) : (angle = posAJour * 30));
 	cible_localisation(ctx,118, 2, angle, couleur_cible_loc);
 }
 
@@ -283,7 +281,7 @@ static void update_time()
 	}  
 	posAJour = (int)((clock_time_t / 3600.0) - (lastTime / 60.0));
 	//posAJour = ((clock_time_t / 60)-(lastTime));
-	//posAJour = 8; // test
+	//posAJour = 1; // test
 #ifdef PBL_COLOR
 	if (posAJour >= 6)/*(posAJour > (INTERV_MAJ_DONNEE / 60) - (INTERV_MAJ_DONNEE_APRES_ECHEC / 60))*/
 	{
