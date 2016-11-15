@@ -2,12 +2,12 @@
     "author": "jocelyntissot@gmail.com",
     "dependencies": {},
     "keywords": [],
-    "name": "tempssolairevrai",
+    "name": "temps-solaire-vrai",
     "pebble": {
         "capabilities": [
             "location"
         ],
-        "displayName": "TempsSolaireVrai",
+        "displayName": "Temps Solaire Vrai",
         "enableMultiJS": false,
         "messageKeys": {
             "corr_eot": 45,
@@ -30,5 +30,5 @@
             "watchface": true
         }
     },
-    "version": "1.0.0"
+    "version": "1.1.0"
 }
