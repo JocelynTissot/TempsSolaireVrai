@@ -2,7 +2,7 @@
 #include "batterie.h"
 
 
-void batterie(GContext *ctx, int16_t x, int16_t y, GColor couleur, int charge)
+void batterie(GContext *ctx, int16_t x, int16_t y, GColor couleur, int charge, int enCharge)
 {
 	
 	/*************************************************/
@@ -46,4 +46,13 @@ void batterie(GContext *ctx, int16_t x, int16_t y, GColor couleur, int charge)
 			GPoint end = GPoint(x + 2 + (i / 5), y + 6);
 			graphics_draw_line(ctx, start, end);
 		}	
+	if (enCharge)
+		{
+			for (int i = 0 ; i < 100 ; i += 10)
+			{
+				GPoint start = GPoint(x + 2 + (i / 5), y + 3);
+				GPoint end = GPoint(x + 2 + (i / 5), y + 5);
+				graphics_draw_line(ctx, start, end);
+			}	
+		}
 }

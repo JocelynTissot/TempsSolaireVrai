@@ -52,12 +52,14 @@ static void eot();
 static void long_dif();
 static void solar_time();
 int charge;
+int enCharge;
 GColor couleur_batterie;
 
 
 static void handle_battery(BatteryChargeState charge_state) 
 {
 	charge = charge_state.charge_percent;
+	enCharge = charge_state.is_charging;
 	//static char battery_text[] = "|:->:þ";
 #ifdef PBL_COLOR
 	if (charge_state.is_charging) 
@@ -163,7 +165,7 @@ static void dessin(Layer *layer, GContext *ctx)
 	int angle;
 	(posAJour < 2) ? (angle = 0) : ((posAJour > 12) ? (angle = 360) : (angle = posAJour * 30));
 	cible_localisation(ctx,118, 2, angle, couleur_cible_loc);
-	batterie(ctx, 10, 5, couleur_batterie, charge);
+	batterie(ctx, 10, 5, couleur_batterie, charge, enCharge);
 }
 
 static void affichage()
