@@ -24,9 +24,6 @@ void batterie(GContext *ctx, int16_t x, int16_t y, GColor couleur, int charge, i
 	/* Contour de la batterie */
 	GRect rect_bounds = GRect(x, y, 23, 9);
 	graphics_draw_rect(ctx, rect_bounds);
-	// Fill a rectangle with rounded corners
-	//int corner_radius = 1;
-	//graphics_draw_round_rect(ctx, rect_bounds, corner_radius);
 	
 	/* Borne + */
 	GPoint start = GPoint(x + 23, y + 2);

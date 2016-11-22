@@ -1,8 +1,8 @@
 //Valeurs de règlages:
-var tempsValPos = (180*60*1000); //temps de validité de la position //180 minutes
+var tempsValPos = (180*60*1000); 		//temps de validité de la position //180 minutes
 var intervEnvDonnee = (90*60*1000); //90 minutes
-var difLoc = 0.0001; //difference de localisation a dépasser pour envoi des données à la montre
-var difCorr_eotd = 0.1; //différence de valeur de correction de l'equation du temps pour envoi 
+var difLoc = 0.0001; 								//difference de localisation a dépasser pour envoi des données à la montre
+var difCorr_eotd = 0.1; 						//différence de valeur de correction de l'equation du temps pour envoi 
 
 var latitude;
 var longitude;
