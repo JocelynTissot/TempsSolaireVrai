@@ -55,7 +55,6 @@ int charge;
 int enCharge;
 GColor couleur_batterie;
 
-
 static void handle_battery(BatteryChargeState charge_state) 
 {
 	charge = charge_state.charge_percent;
@@ -144,6 +143,7 @@ static void handle_battery(BatteryChargeState charge_state)
 	//text_layer_set_text_color(s_battery_layer, GColorWhite); 
 #endif
 	//text_layer_set_text(s_battery_layer, battery_text);
+	layer_mark_dirty(s_dessin_layer);
 }
 
 //static void send_request(int command) {
@@ -167,6 +167,7 @@ static void dessin(Layer *layer, GContext *ctx)
 	cible_localisation(ctx,118, 2, angle, couleur_cible_loc);
 	batterie(ctx, 10, 5, couleur_batterie, charge, enCharge);
 }
+
 
 static void affichage()
 {
@@ -248,7 +249,7 @@ static void affichage()
 	text_layer_set_text(s_longitude_difference_d_layer, buffer_longitude_difference_d);
 	text_layer_set_text(s_text_eot_layer, buffer_text_eot);
 	text_layer_set_text(s_eot_layer, buffer_eot);
-	//text_layer_set_text(s_text_battery_layer, buffer_text_battery);
+	layer_set_update_proc(s_dessin_layer, dessin);
 	//text_layer_set_text(s_text_posAJour_layer, buffer_text_posAJour);
 	//text_layer_set_text(s_posAJour_layer, buffer_posAJour);
 }
@@ -681,7 +682,6 @@ static void main_window_load(Window *window)
 	//text_layer_set_text_color(s_posAJour_layer, GColorWhite);
 	text_layer_set_background_color(s_posAJour_layer, GColorClear);
 	text_layer_set_text(s_posAJour_layer, "+ -h");*/
-	layer_set_update_proc(s_dessin_layer, dessin); 
 
 	// Improve the layout to be more like a watchface
 
