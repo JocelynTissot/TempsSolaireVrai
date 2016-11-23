@@ -1,5 +1,5 @@
 //Valeurs de règlages:
-var tempsValPos = (180*60*1000); 		//temps de validité de la position //180 minutes
+var tempsValPos = (60*60*1000); 		//temps de validité de la position //60 minutes
 var intervEnvDonnee = (90*60*1000); //90 minutes
 var difLoc = 0.0001; 								//difference de localisation a dépasser pour envoi des données à la montre
 var difCorr_eotd = 0.1; 						//différence de valeur de correction de l'equation du temps pour envoi 
@@ -28,7 +28,7 @@ function requestLocationAsync() {
         {
             enableHighAccuracy : true,
             timeout: 10000, 
-            maximumAge: tempsValPos //90 minutes ou //Infinity
+            maximumAge: tempsValPos //60 minutes ou //Infinity
         }
     );    
 }
@@ -70,6 +70,8 @@ function time_Zone(){
 
 function sendToWatch() {
         corr_eotd = correction_eot();
+				offsetTimeZone();
+        time_Zone();  
         //console.log("  latitude = " + latitude);
         console.log("  longitude = " + longitude);
       /*if (Math.abs(latitude - lastLatitude) > 0.0001 || Math.abs(longitude - lastLongitude) > 0.0001) { */
@@ -86,19 +88,6 @@ function sendToWatch() {
       function(e) { console.log("Unsuccessfully delivered message with transactionId=" + e.data.transactionId);}
   );
   lastSend = Date.now();
-  /*
-      }
-        Pebble.sendAppMessage( 
-      { 
-         "timezoneOffset" : offsetTZ,
-         "time_zone"      : timeZone,
-         "eot"            : eotd * 1000000,
-      },
-      
-      function(e) { console.log("Successfully delivered message with transactionId="   + e.data.transactionId); },
-      function(e) { console.log("Unsuccessfully delivered message with transactionId=" + e.data.transactionId);}
-    );
-    */
 }
 
 
@@ -117,15 +106,15 @@ function locationSuccess(position) {
     corr_eotd = correction_eot();
 
     if (applicationStarting) {
-        offsetTimeZone();
-        time_Zone();  
+        //offsetTimeZone();
+        //time_Zone();  
         sendToWatch();    
         applicationStarting = false;
       
-    }// else if (Math.abs(latitude - lastLatitude) > 0.01 || Math.abs(longitude - lastLongitude) > 0.01) { // if location change is significant
-      else if (Math.abs(latitude - lastLatitude) > difLoc || Math.abs(longitude - lastLongitude) > difLoc || Math.abs(corr_eotd - last_corr_eotd) > difCorr_eotd && (lastSend + intervEnvDonnee) < Date.now()) { // if location change is significant
-        offsetTimeZone();
-        time_Zone();  
+    }
+    else if (Math.abs(latitude - lastLatitude) > difLoc || Math.abs(longitude - lastLongitude) > difLoc || Math.abs(corr_eotd - last_corr_eotd) > difCorr_eotd && (lastSend + intervEnvDonnee) < Date.now()) { // if location change is significant
+        //offsetTimeZone();
+        //time_Zone();  
         sendToWatch();
         
     }
@@ -152,14 +141,14 @@ function locationError(error) {
   
     if (applicationStarting) {
         // use last cached location if available
-        offsetTimeZone();
-        time_Zone();  
+        //offsetTimeZone();
+        //time_Zone();  
         sendToWatch();
         applicationStarting = false;
       
     }else if (Math.abs(corr_eotd - last_corr_eotd) > difCorr_eotd && (lastSend + intervEnvDonnee) < Date.now()){
-        offsetTimeZone();
-        time_Zone();  
+        //offsetTimeZone();
+        //time_Zone();  
         sendToWatch();
     }
 }

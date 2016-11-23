@@ -1,7 +1,7 @@
 //Règlages divers
 
-#define INTERV_MAJ_DONNEE 120             //intervale de demande de mise à jour des données au téléphone [min]
-#define INTERV_MAJ_DONNEE_APRES_ECHEC 120  //intervale de demande de mise à jour des données au téléphone apres echec [min]
+#define INTERV_MAJ_DONNEE 180             //intervale de demande de mise à jour des données au téléphone [min]
+#define INTERV_MAJ_DONNEE_APRES_ECHEC 90  //intervale de demande de mise à jour des données au téléphone apres echec [min]
 
 // Valeurs par défaut et adresse mémoire persistante
 
