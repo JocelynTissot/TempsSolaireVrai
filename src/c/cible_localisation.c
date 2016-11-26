@@ -3,7 +3,7 @@
 
 void cible_localisation(GContext *ctx, int16_t x, int16_t y, int32_t angleStartInt, GColor couleur)
 {
-	
+
 	/*************************************************/
 	/*          Dessin symbole localisation          */
 	/*************************************************/
@@ -13,13 +13,13 @@ void cible_localisation(GContext *ctx, int16_t x, int16_t y, int32_t angleStartI
 	int32_t angle_endExt;
 	int32_t angle_endInt;
 	int32_t angle_startInt;
-		
+
 	/* Définir la couleur de la ligne */
- 	graphics_context_set_stroke_color(ctx, couleur);	
-	
+	graphics_context_set_stroke_color(ctx, couleur);	
+
 	/* Définir la couleur de remplissage */
- 	graphics_context_set_fill_color(ctx, couleur);
-	
+	graphics_context_set_fill_color(ctx, couleur);
+
 	/* Défini la largeur des lignes */
 	epaisseurTrait = 1;
 	graphics_context_set_stroke_width(ctx, epaisseurTrait);
@@ -38,19 +38,19 @@ void cible_localisation(GContext *ctx, int16_t x, int16_t y, int32_t angleStartI
 	graphics_draw_line(ctx, startVerB, endVerB);
 	graphics_draw_line(ctx, startHorG, endHorG);
 	graphics_draw_line(ctx, startHorD, endHorD);
-	
+
 	/* Arc intérieur */
 	GRect arcInt = GRect(x + 8, y + 8, 7, 7);
 	angle_startInt = DEG_TO_TRIGANGLE(angleStartInt);
 	angle_endInt = DEG_TO_TRIGANGLE(360);
 	epaisseurArc = 6; 
 	graphics_fill_radial(ctx, arcInt , GOvalScaleModeFitCircle, epaisseurArc, angle_startInt, angle_endInt);
-	
+
 	/* Cercle exterieur (arc 360 deg) */
 	GRect arcExt = GRect(x + 3, y + 3, 17, 17);
 	angle_startExt = DEG_TO_TRIGANGLE(0);
 	angle_endExt = DEG_TO_TRIGANGLE(360);
 	epaisseurArc = 3; 
 	graphics_fill_radial(ctx, arcExt , GOvalScaleModeFitCircle, epaisseurArc, angle_startExt, angle_endExt);
-	
+
 }

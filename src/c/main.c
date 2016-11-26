@@ -228,12 +228,12 @@ static void update_time()
 	couleur_cible_loc = GColorWhite;
 #endif
 	/*
-	if (((lastTime + (INTERV_MAJ_DONNEE)) < (clock_time_t / 60)) && ((lastTime2 + (INTERV_MAJ_DONNEE_APRES_ECHEC)) < (clock_time_t / 60))) 
-	{   
-		//Vibreur
-		//vibes_double_pulse();
-		lastTime2 = (clock_time_t / 60);
-		send_request(0); // request data refresh from phone JS         
+	   if (((lastTime + (INTERV_MAJ_DONNEE)) < (clock_time_t / 60)) && ((lastTime2 + (INTERV_MAJ_DONNEE_APRES_ECHEC)) < (clock_time_t / 60))) 
+	   {   
+	//Vibreur
+	//vibes_double_pulse();
+	lastTime2 = (clock_time_t / 60);
+	send_request(0); // request data refresh from phone JS         
 	} 
 	*/
 	affichage();
@@ -611,7 +611,7 @@ static void main_window_load(Window *window)
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_text_eot_layer));
 	layer_add_child(window_get_root_layer(window), text_layer_get_layer(s_eot_layer));
 	layer_add_child(window_get_root_layer(window), s_dessin_layer);
-	
+
 	// Make sure the time is displayed from the start
 	handle_battery(battery_state_service_peek());
 }
@@ -662,9 +662,9 @@ static void init() {
 
 	// Create main Window element and assign to pointer
 	s_main_window = window_create();
-	
+
 	GRect bounds = layer_get_bounds(window_get_root_layer(s_main_window));
-	
+
 	s_dessin_layer = layer_create(bounds);
 
 	// Set handlers to manage the elements inside the Window

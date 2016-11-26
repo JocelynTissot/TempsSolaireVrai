@@ -22,189 +22,189 @@ var lastSend;
 // 2. Periodic update. Data is sent only if location is available and location has changed considerably
 
 function requestLocationAsync() {
-    navigator.geolocation.getCurrentPosition(
-        locationSuccess,
-        locationError,
-        {
-            enableHighAccuracy : true,
-            timeout: 10000, 
-            maximumAge: tempsValPos //60 minutes ou //Infinity
-        }
-    );    
+	navigator.geolocation.getCurrentPosition(
+			locationSuccess,
+			locationError,
+			{
+				enableHighAccuracy : true,
+				timeout: 10000, 
+				maximumAge: tempsValPos //60 minutes ou //Infinity
+			}
+			);    
 }
 
 Pebble.addEventListener("ready",  //démarrage de l'appli
-    function(e) {
-        console.log("JS starting...");
-            
-        latitude  = localStorage.getItem("latitude");
-        longitude = localStorage.getItem("longitude");
-        console.log("Retrieved from localStorage: latitude=" + latitude + ", longitude=" + longitude);
-        
-        // Call first time when starting:
-        requestLocationAsync();    
-        // Schedule periodic position poll every X minutes:
-        //setInterval(function() {requestLocationAsync();offsetTimeZone();time_Zone();sendToWatch();}, intervEnvDonnee);
-        setInterval(function() {requestLocationAsync();}, intervEnvDonnee);
-}
-);
+		function(e) {
+			console.log("JS starting...");
+
+			latitude  = localStorage.getItem("latitude");
+			longitude = localStorage.getItem("longitude");
+			console.log("Retrieved from localStorage: latitude=" + latitude + ", longitude=" + longitude);
+
+			// Call first time when starting:
+			requestLocationAsync();    
+			// Schedule periodic position poll every X minutes:
+			//setInterval(function() {requestLocationAsync();offsetTimeZone();time_Zone();sendToWatch();}, intervEnvDonnee);
+			setInterval(function() {requestLocationAsync();}, intervEnvDonnee);
+		}
+		);
 
 Pebble.addEventListener('appmessage',  //réception d'une demande de la montre
-    function(e) {
-        console.log('Received appmessage: ' + JSON.stringify(e.payload));
-        applicationStarting = true;  // pour l'envoi des données dans tous les cas
-        requestLocationAsync(); 
-    }
-);
+		function(e) {
+			console.log('Received appmessage: ' + JSON.stringify(e.payload));
+			applicationStarting = true;  // pour l'envoi des données dans tous les cas
+			requestLocationAsync(); 
+		}
+		);
 
 function offsetTimeZone(){offsetTZ = new Date().getTimezoneOffset() * 60;}  
 
 //http://www.onlineaspect.com/2007/06/08/auto-detect-a-time-zone-with-javascript/
 function time_Zone(){  
-    var rightNow = new Date();
-    var jan1 = new Date(rightNow.getFullYear(), 0, 1, 0, 0, 0, 0);
-    var temp = jan1.toGMTString();
-    var jan2 = new Date(temp.substring(0, temp.lastIndexOf(" ")-1));
-    timeZone = (jan1 - jan2) / (1000);
+	var rightNow = new Date();
+	var jan1 = new Date(rightNow.getFullYear(), 0, 1, 0, 0, 0, 0);
+	var temp = jan1.toGMTString();
+	var jan2 = new Date(temp.substring(0, temp.lastIndexOf(" ")-1));
+	timeZone = (jan1 - jan2) / (1000);
 }
 
 function sendToWatch() {
-        corr_eotd = correction_eot();
-				offsetTimeZone();
-        time_Zone();  
-        //console.log("  latitude = " + latitude);
-        console.log("  longitude = " + longitude);
-      /*if (Math.abs(latitude - lastLatitude) > 0.0001 || Math.abs(longitude - lastLongitude) > 0.0001) { */
-      Pebble.sendAppMessage( 
-      { 
-         //"latitude"       : latitude * 1000000,
-         "longitude"      : longitude * 1000000,
-         "timezoneOffset" : offsetTZ,
-         "time_zone"      : timeZone,
-         "corr_eot"       : corr_eotd * 1000000,
-      },
-      
-      function(e) { console.log("Successfully delivered message with transactionId="   + e.data.transactionId); },
-      function(e) { console.log("Unsuccessfully delivered message with transactionId=" + e.data.transactionId);}
-  );
-  lastSend = Date.now();
+	corr_eotd = correction_eot();
+	offsetTimeZone();
+	time_Zone();  
+	//console.log("  latitude = " + latitude);
+	console.log("  longitude = " + longitude);
+	/*if (Math.abs(latitude - lastLatitude) > 0.0001 || Math.abs(longitude - lastLongitude) > 0.0001) { */
+	Pebble.sendAppMessage( 
+			{ 
+				//"latitude"       : latitude * 1000000,
+				"longitude"      : longitude * 1000000,
+				"timezoneOffset" : offsetTZ,
+				"time_zone"      : timeZone,
+				"corr_eot"       : corr_eotd * 1000000,
+			},
+
+			function(e) { console.log("Successfully delivered message with transactionId="   + e.data.transactionId); },
+			function(e) { console.log("Unsuccessfully delivered message with transactionId=" + e.data.transactionId);}
+			);
+	lastSend = Date.now();
 }
 
 
 function locationSuccess(position) {
-    lastLatitude  = latitude;
-    lastLongitude = longitude;
-    last_corr_eotd = corr_eotd;
-    
-    latitude  = position.coords.latitude;
-    longitude = position.coords.longitude;
-    console.log("Got position: lat " + latitude + ", long " + longitude);
-    
-    localStorage.setItem("latitude",  latitude);
-    localStorage.setItem("longitude", longitude);
-  
-    corr_eotd = correction_eot();
+	lastLatitude  = latitude;
+	lastLongitude = longitude;
+	last_corr_eotd = corr_eotd;
 
-    if (applicationStarting) {
-        //offsetTimeZone();
-        //time_Zone();  
-        sendToWatch();    
-        applicationStarting = false;
-      
-    }
-    else if (Math.abs(latitude - lastLatitude) > difLoc || Math.abs(longitude - lastLongitude) > difLoc || Math.abs(corr_eotd - last_corr_eotd) > difCorr_eotd && (lastSend + intervEnvDonnee) < Date.now()) { // if location change is significant
-        //offsetTimeZone();
-        //time_Zone();  
-        sendToWatch();
-        
-    }
+	latitude  = position.coords.latitude;
+	longitude = position.coords.longitude;
+	console.log("Got position: lat " + latitude + ", long " + longitude);
+
+	localStorage.setItem("latitude",  latitude);
+	localStorage.setItem("longitude", longitude);
+
+	corr_eotd = correction_eot();
+
+	if (applicationStarting) {
+		//offsetTimeZone();
+		//time_Zone();  
+		sendToWatch();    
+		applicationStarting = false;
+
+	}
+	else if (Math.abs(latitude - lastLatitude) > difLoc || Math.abs(longitude - lastLongitude) > difLoc || Math.abs(corr_eotd - last_corr_eotd) > difCorr_eotd && (lastSend + intervEnvDonnee) < Date.now()) { // if location change is significant
+		//offsetTimeZone();
+		//time_Zone();  
+		sendToWatch();
+
+	}
 }
 
 function locationError(error) {
-    console.log("navigator.geolocation.getCurrentPosition() returned error " + error.code);
-    switch(error.code) {
-        case error.PERMISSION_DENIED:
-            console.log("  Permission denied.");
-            break;
-        case error.POSITION_UNAVAILABLE:
-            console.log("  Position unavailable.");
-            break;
-        case error.TIMEOUT:
-            console.log("  Timeout.");
-            break;
-        case error.UNKNOWN_ERROR:
-            console.log("  Unknown error.");
-            break;
-    }    
-  
-    corr_eotd = correction_eot();
-  
-    if (applicationStarting) {
-        // use last cached location if available
-        //offsetTimeZone();
-        //time_Zone();  
-        sendToWatch();
-        applicationStarting = false;
-      
-    }else if (Math.abs(corr_eotd - last_corr_eotd) > difCorr_eotd && (lastSend + intervEnvDonnee) < Date.now()){
-        //offsetTimeZone();
-        //time_Zone();  
-        sendToWatch();
-    }
+	console.log("navigator.geolocation.getCurrentPosition() returned error " + error.code);
+	switch(error.code) {
+		case error.PERMISSION_DENIED:
+			console.log("  Permission denied.");
+			break;
+		case error.POSITION_UNAVAILABLE:
+			console.log("  Position unavailable.");
+			break;
+		case error.TIMEOUT:
+			console.log("  Timeout.");
+			break;
+		case error.UNKNOWN_ERROR:
+			console.log("  Unknown error.");
+			break;
+	}    
+
+	corr_eotd = correction_eot();
+
+	if (applicationStarting) {
+		// use last cached location if available
+		//offsetTimeZone();
+		//time_Zone();  
+		sendToWatch();
+		applicationStarting = false;
+
+	}else if (Math.abs(corr_eotd - last_corr_eotd) > difCorr_eotd && (lastSend + intervEnvDonnee) < Date.now()){
+		//offsetTimeZone();
+		//time_Zone();  
+		sendToWatch();
+	}
 }
 
 function correction_eot(){
-    /*
-bbb = 367 * The_Year - 730531.5
-ccc = int((7 * int(The_Year + (The_Month + 9) / 12)) / 4)
-ddd = int(275 * The_Month / 9) + The_Day
-D2000 = bbb - ccc + ddd + (The_Hour + The_Minute / 60 + The_Second / 3600) / 24
-Cycle = int(D2000 / 365.25)
-Theta = 0.0172024 * (D2000 - 365.25 * Cycle)
-Average = 0.00526
-Amp1 = 7.36303 - Cycle * 9e-05
-Amp2 = 9.92465 - Cycle * 0.00014
-Phi1 = 3.07892 + Cycle * -0.00019
-Phi2 = -1.38995 + Cycle * 0.00013
+	/*
+	   bbb = 367 * The_Year - 730531.5
+	   ccc = int((7 * int(The_Year + (The_Month + 9) / 12)) / 4)
+	   ddd = int(275 * The_Month / 9) + The_Day
+	   D2000 = bbb - ccc + ddd + (The_Hour + The_Minute / 60 + The_Second / 3600) / 24
+	   Cycle = int(D2000 / 365.25)
+	   Theta = 0.0172024 * (D2000 - 365.25 * Cycle)
+	   Average = 0.00526
+	   Amp1 = 7.36303 - Cycle * 9e-05
+	   Amp2 = 9.92465 - Cycle * 0.00014
+	   Phi1 = 3.07892 + Cycle * -0.00019
+	   Phi2 = -1.38995 + Cycle * 0.00013
 
-EoT1 = Amp1 * sin(1 * (Theta + Phi1))
-EoT2 = Amp2 * sin(2 * (Theta + Phi2))
-EoT3 = 0.3173 * sin(3 * (Theta - 0.94686))
-EoT4 = 0.21922 * sin(4 * (Theta - 0.60716))
+	   EoT1 = Amp1 * sin(1 * (Theta + Phi1))
+	   EoT2 = Amp2 * sin(2 * (Theta + Phi2))
+	   EoT3 = 0.3173 * sin(3 * (Theta - 0.94686))
+	   EoT4 = 0.21922 * sin(4 * (Theta - 0.60716))
 
-EoT = Average + EoT1 + EoT2 + EoT3 + EoT4
-*/
-  var j1970;
-  var d2000;
-  var cycle;
-  var theta;
-  var average;
-  var amp1;
-  var amp2;
-  var phi1;
-  var phi2;
-  var eot1;
-  var eot2;
-  var eot3;
-  var eot4;
+	   EoT = Average + EoT1 + EoT2 + EoT3 + EoT4
+	   */
+	var j1970;
+	var d2000;
+	var cycle;
+	var theta;
+	var average;
+	var amp1;
+	var amp2;
+	var phi1;
+	var phi2;
+	var eot1;
+	var eot2;
+	var eot3;
+	var eot4;
 
-  j1970 = ((Date.now() / 1000) / (3600*24));//+ (new Date().getTimezoneOffset()*60)) / (3600.0*24.0);
-  d2000 = j1970 - 11322.5;
-  cycle = Math.floor(d2000 / 365.25);
-  theta = 0.0172024 * (d2000 - 365.25 * cycle);
-  average = 0.00526;
-  amp1 = 7.36303 - cycle * 9.0e-05;
-  amp2 = 9.92465 - cycle * 0.00014;
-  phi1 = 3.07892 + cycle * -0.00019;
-  phi2 = -1.38995 + cycle * 0.00013;
-  //Calcul de l'équation du temps
-  eot1 = amp1 * Math.sin(1.0 * (theta + phi1));
-  eot2 = amp2 * Math.sin(2.0 * (theta + phi2));
-  eot3 = 0.3173* Math.sin(3.0 * (theta - 0.94686));
-  eot4 = 0.21922 * Math.sin(4.0 * (theta - 0.60716));
-  var eotd = average + eot1 + eot2 + eot3 + eot4;
-  var eotd_precis = Sunpos();
-  return (eotd_precis - eotd);
+	j1970 = ((Date.now() / 1000) / (3600*24));//+ (new Date().getTimezoneOffset()*60)) / (3600.0*24.0);
+	d2000 = j1970 - 11322.5;
+	cycle = Math.floor(d2000 / 365.25);
+	theta = 0.0172024 * (d2000 - 365.25 * cycle);
+	average = 0.00526;
+	amp1 = 7.36303 - cycle * 9.0e-05;
+	amp2 = 9.92465 - cycle * 0.00014;
+	phi1 = 3.07892 + cycle * -0.00019;
+	phi2 = -1.38995 + cycle * 0.00013;
+	//Calcul de l'équation du temps
+	eot1 = amp1 * Math.sin(1.0 * (theta + phi1));
+	eot2 = amp2 * Math.sin(2.0 * (theta + phi2));
+	eot3 = 0.3173* Math.sin(3.0 * (theta - 0.94686));
+	eot4 = 0.21922 * Math.sin(4.0 * (theta - 0.60716));
+	var eotd = average + eot1 + eot2 + eot3 + eot4;
+	var eotd_precis = Sunpos();
+	return (eotd_precis - eotd);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -231,7 +231,7 @@ function Get_Ecliptic_Longitude(TT_cent) {
 	var L3 = 0 ;
 	var L4 = 0 ;
 	var L5 = 0 ;
-    L0 =      175347046 ;
+	L0 =      175347046 ;
 	L0 = L0 +   3341656 * Math.cos(4.6692568 +   6283.07585 * tau) ;
 	L0 = L0 +     34894 * Math.cos(4.6261    +  12566.15170 * tau) ;
 	L0 = L0 +      3497 * Math.cos(2.7441    +   5753.38490 * tau) ;
@@ -295,7 +295,7 @@ function Get_Ecliptic_Longitude(TT_cent) {
 	L0 = L0 +        30 * Math.cos(0.44      +  83996.85000 * tau) ;
 	L0 = L0 +        30 * Math.cos(2.74      +   1349.87000 * tau) ;
 	L0 = L0 +        25 * Math.cos(3.16      +   4690.48000 * tau) ;
-	
+
 	L1 =   628331966747 ;
 	L1 = L1 +    206059 * Math.cos(2.678235  +  6283.07585  * tau) ;
 	L1 = L1 +      4303 * Math.cos(2.6351    + 12566.1517   * tau) ;
@@ -445,7 +445,7 @@ function Get_Radius_Vector(TT_cent) {
 	R0 = R0 +        28   * Math.cos(1.21      +    6286.6    * tau) ;
 	R0 = R0 +        28   * Math.cos(1.9       +    6279.55   * tau) ;
 	R0 = R0 +        26   * Math.cos(4.59      +   10447.39   * tau) ;
-	
+
 	R1 =         103019   * Math.cos(1.10749   +   6283.07585 * tau) ;
 	R1 = R1 +      1721   * Math.cos(1.0644    +  12566.1517  * tau) ;
 	R1 = R1 +       702   * Math.cos(3.142     +      0.0      * tau) ;
@@ -614,7 +614,7 @@ function Get_Nutation_in_Obliquity(TT_Cent) {
 	Nut_in_Obl_deg = Nut_in_Obl_deg + (3)               * Math.cos(-2 * MEM - MAS + 2 * MAL + LAN) ;
 	Nut_in_Obl_deg = Nut_in_Obl_deg + (3)               * Math.cos(-2 * MEM + LAN) ;
 	Nut_in_Obl_deg = Nut_in_Obl_deg + (3)               * Math.cos(2 * MAM + 2 * MAL + LAN) ;
-		
+
 	Nut_in_Obl_deg = Nut_in_Obl_deg * 0.0001 / 3600 ;
 	return Nut_in_Obl_deg ;
 }
@@ -626,15 +626,15 @@ function Get_Nutation_in_Obliquity(TT_Cent) {
 //function Sunpos(Topo_Long,Topo_Lat,Zone,Height,Dst,Pressure,Temperature,Dut1,Year,Month,Day,Hour,Minute,Second)
 function Sunpos()
 {	
-  var Topo_Lat        = latitude;
-  var Topo_Long       = longitude;
+	var Topo_Lat        = latitude;
+	var Topo_Long       = longitude;
 	var Local_hrs       = (new Date().getHours() * 3600) + (new Date().getMinutes() * 60) + (new Date().getSeconds());
 	var UTC_hrs         = Local_hrs + (new Date().getTimezoneOffset()*60) ;
 	var UT1_hrs         = UTC_hrs / 3600.0;
 	var UT1_deg         = UT1_hrs * 15.0 ;
-  var Day             = new Date().getDate();
+	var Day             = new Date().getDate();
 	var Month           = new Date().getMonth()+1;
-  var Year            = new Date().getFullYear();
+	var Year            = new Date().getFullYear();
 	if (Month <= 2) { Year        -= 1 ; Month       += 12 ;}
 	var A                    = Math.floor(Year/100) ;
 	var B                    = 2 - A + Math.floor(A/4) ;
@@ -642,17 +642,17 @@ function Sunpos()
 	var JD_days              = JD_Date + UT1_hrs / 24.0 ;
 
 	var tau                      = (JD_days - 2451545) / 36525 ;
-    var Del_T_sec ;
+	var Del_T_sec ;
 	if   (tau < 0.05) 
-    { Del_T_sec              = ((- 624.197 * tau - 186.451)  * tau +  27.384) * tau + 63.837 ;}
+	{ Del_T_sec              = ((- 624.197 * tau - 186.451)  * tau +  27.384) * tau + 63.837 ;}
 	else if (tau < 0.10) 
-    { Del_T_sec              = ((-7277.152 * tau + 1756.476) * tau - 108.618) * tau + 66.637 ;}
+	{ Del_T_sec              = ((-7277.152 * tau + 1756.476) * tau - 108.618) * tau + 66.637 ;}
 	else if (tau < 0.15) 
-    { Del_T_sec              = ((-8614.842 * tau + 3574.448) * tau - 441.389) * tau + 83.073 ;}
+	{ Del_T_sec              = ((-8614.842 * tau + 3574.448) * tau - 441.389) * tau + 83.073 ;}
 	else if (tau < 0.20) 
-    { Del_T_sec              = ((-8386.677 * tau + 4245.182) * tau - 659.939) * tau + 99.801 ;}
+	{ Del_T_sec              = ((-8386.677 * tau + 4245.182) * tau - 659.939) * tau + 99.801 ;}
 	else           
-    { Del_T_sec              = (     2.162                   * tau +  44.874) * tau + 61.749 ;}
+	{ Del_T_sec              = (     2.162                   * tau +  44.874) * tau + 61.749 ;}
 
 	var JD_TT_days           = JD_days + Del_T_sec/24/3600.0 ;
 	var TT_cent              = (JD_TT_days - 2451545)/36525.0 ;
@@ -669,16 +669,16 @@ function Sunpos()
 	var Obliquity_Base       = 23.0 + 260.0 / 600.0 + 21.448 / 3600.0 ;
 	var deli                 = (tau00 * (-4680.93 + tau00 * ( -1.55 + tau00 * (1999.25 + tau00 * (-51.38 + tau00 * ( -249.67 + tau00 * (-39.05 + tau00 * (   7.12 + tau00 * (  5.79 + tau00 * (   27.87 + tau00 *    2.45)))))))))) ;
 	var Obl_Mean_deg         = Obliquity_Base + deli / 3600 ;
-	
+
 	//***************************************************************************************************
 	// Convert from VSOP >> FK5
 	// Reference: Astronomical Algorithms 2nd Edition 1998 by Jean Meeus - Page 219 Equ 32.3
-    var Lambda_Dash_rad      = radians(Sol_Long_V_deg - 1.397 * TT_cent - 0.00031 * UT1_hrs * UT1_hrs) ;
+	var Lambda_Dash_rad      = radians(Sol_Long_V_deg - 1.397 * TT_cent - 0.00031 * UT1_hrs * UT1_hrs) ;
 	var Long_Corr            = (-0.09033 + 0.03916 * (Math.cos(Lambda_Dash_rad) + Math.sin(Lambda_Dash_rad)) * Math.tan(radians(Sol_Lat_V_deg))) / 3600.0 ;
 	var Lat_Corr             = (           0.03916 * (Math.cos(Lambda_Dash_rad) - Math.sin(Lambda_Dash_rad))                                   ) / 3600.0 ;
 	var Sol_Long_F_deg       = Sol_Long_V_deg + Long_Corr ;
 	var Sol_Lat_F_deg        = Sol_Lat_V_deg  + Lat_Corr ;
-		
+
 	// Correct for Nutation & Aberation_deg
 	var Obl_True_deg         = Obl_Mean_deg + Nut_in_Obl_deg ;	
 	var Aberation_deg        = -20.4898 / Sol_Radius_AU /3600.0 ;
@@ -697,10 +697,10 @@ function Sunpos()
 
 	// Convert >> Degrees & hours
 	var RA_deg               = (360.0 + degrees(RA_rad)) % 360.0 ;
-//	var RA_hrs               = RA_deg / 15.0 ;
-//	var Decl_deg             = degrees(Decl_rad) ;
-    
-    // ***************************************************************************************************
+	//	var RA_hrs               = RA_deg / 15.0 ;
+	//	var Decl_deg             = degrees(Decl_rad) ;
+
+	// ***************************************************************************************************
 	// Calculate Greenwich Mean Sidereal Time
 	// Reference: USNO Circular 179 by G.H. Kaplan
 	//            The IAU Resolutions on Astronomical Reference Systems, Time Scales, 
@@ -711,19 +711,19 @@ function Sunpos()
 	var Extra                = 0.014506 + TT_cent * (4612.156534 + TT_cent * (1.3915817 + TT_cent * (-0.00000044 + TT_cent * (-0.000029956 - TT_cent * 0.0000000368)))) ;
 	var GMST_hrs             = ((GMST_base + Extra / 15.0) % 86400.0)/3600.0  ;
 	var GMST_deg             = 15.0 * GMST_hrs ;
-	
+
 	// ***************************************************************************************************
 	// Calculate Equation of the Equinoxs & Greenwich Apparent Sidereal Time
 	// Reference: Astronomical Algorithms 2nd Edition 1998 by Jean Meeus - Page 88
 	var Eqn_of_Equi_deg      = Nut_in_Long_deg * Math.cos(Obl_rad) ;
 	var GAST_deg             = GMST_hrs * 15.0 + Eqn_of_Equi_deg ;
-//	var GAST_hrs             = GAST_deg / 15.0 ;
-	
+	//	var GAST_hrs             = GAST_deg / 15.0 ;
+
 	// ***************************************************************************************************
 	// Calculate Geocentric Equation of Time
 	var EoT_deg              = (GMST_deg - UT1_deg - RA_deg + 180.0 + Eqn_of_Equi_deg ) ;
 	if (EoT_deg > 180)         {EoT_deg = EoT_deg - 360.0;}
-//	var EoT_min              = EoT_deg * 4.0 ;
+	//	var EoT_min              = EoT_deg * 4.0 ;
 
 	// ***************************************************************************************************
 	// Local Apparent Siderial Time and Hour Angle
@@ -739,10 +739,10 @@ function Sunpos()
 	var Topo_Lat_rad         = radians(Topo_Lat) ;
 	var tanu                 = 0.99664719 * Math.tan(Topo_Lat_rad) ;
 	var u                    = Math.atan(tanu) ;
-  //var Rho_sin_Phi_         = 0.99664719 * Math.sin(u) + Math.sin(Topo_Lat_rad) * Height / 6378140 ;
+	//var Rho_sin_Phi_         = 0.99664719 * Math.sin(u) + Math.sin(Topo_Lat_rad) * Height / 6378140 ;
 	var Rho_sin_Phi_         = 0.99664719 * Math.sin(u) + Math.sin(Topo_Lat_rad) * 500 / 6378140 ;
 	if (Topo_Lat_rad < 0)      {Rho_sin_Phi_ = -Rho_sin_Phi_;} 
-  //var Rho_cos_Phi_         = Math.cos(u) + Math.cos(Topo_Lat_rad) * Height / 6378140 ;
+	//var Rho_cos_Phi_         = Math.cos(u) + Math.cos(Topo_Lat_rad) * Height / 6378140 ;
 	var Rho_cos_Phi_         = Math.cos(u) + Math.cos(Topo_Lat_rad) * 500 / 6378140 ;
 	var sin_Pi_              = 3.14159265358979 * 8.794 / Sol_Radius_AU / 180 / 3600 ;
 
@@ -752,7 +752,7 @@ function Sunpos()
 	var tan_Del_RA           = (-Rho_cos_Phi_ * sin_Pi_ * Math.sin(HA_rad)) / (Math.cos(Decl_rad) - Rho_cos_Phi_ * sin_Pi_ * Math.cos(HA_rad)) ;
 	var RA_Parallax_rad      = Math.atan(tan_Del_RA) ;
 	var Topo_RA_deg          = (RA_deg + degrees(RA_Parallax_rad)) % 360 ;
-//	var Topo_RA_hrs          = Topo_RA_deg / 15.0 ;
+	//	var Topo_RA_hrs          = Topo_RA_deg / 15.0 ;
 
 	// ***************************************************************************************************
 	// Convert Geocentric Declination >> Topocentric Declination
@@ -760,46 +760,46 @@ function Sunpos()
 	var tan_dec1             = (Math.sin(Decl_rad) - Rho_sin_Phi_ * sin_Pi_) * Math.cos(RA_Parallax_rad) ;
 	var tan_dec2             = (Math.cos(Decl_rad) - Rho_cos_Phi_ * sin_Pi_ * Math.cos(HA_rad)) ;
 	var Topo_Decl_rad        = Math.atan(tan_dec1 / tan_dec2) ;
-//	var Topo_Decl_deg        = degrees(Topo_Decl_rad) ;
+	//	var Topo_Decl_deg        = degrees(Topo_Decl_rad) ;
 
 	// ***************************************************************************************************
 	// Calculate Topocentric Equation of Time
 	var Topo_EoT_deg         = (GAST_deg - UT1_deg - Topo_RA_deg + 180.0 ) % 360.0  ;
 	if (Topo_EoT_deg > 180.0) {Topo_EoT_deg = Topo_EoT_deg - 360.0;}
 	var Topo_EoT_min         = Topo_EoT_deg * 4.0 ;
-//	var Sol_to_Civil_min     = -Topo_EoT_min + Zone * 60.0 - Topo_Long * 4.0 + Dst * 60.0 ;
+	//	var Sol_to_Civil_min     = -Topo_EoT_min + Zone * 60.0 - Topo_Long * 4.0 + Dst * 60.0 ;
 
 	// ***************************************************************************************************
 	//Calculate Topocentric Hour Angle
-		var Topo_HA_deg          = (LAST_deg - Topo_RA_deg) % 360.0 ;
-//		var Topo_HA_hrs          = Topo_HA_deg / 15.0 ;
-		if (Topo_HA_deg > 180)     { Topo_HA_deg = Topo_HA_deg - 360.0;} 
-		var Topo_HA_rad          = radians(Topo_HA_deg) ;
+	var Topo_HA_deg          = (LAST_deg - Topo_RA_deg) % 360.0 ;
+	//		var Topo_HA_hrs          = Topo_HA_deg / 15.0 ;
+	if (Topo_HA_deg > 180)     { Topo_HA_deg = Topo_HA_deg - 360.0;} 
+	var Topo_HA_rad          = radians(Topo_HA_deg) ;
 
 	// ***************************************************************************************************
 	//Convert Hour Angle, Latitude & Declination to Solar Azimuth & Altitude
 	//Reference: Astronomical Algorithms 2nd Edition 1998 by Jean Meeus - Page 93
-		var Alt_rad              = Math.asin(Math.sin(Topo_Lat_rad) * Math.sin(Topo_Decl_rad) + Math.cos(Topo_Lat_rad) * Math.cos(Topo_Decl_rad) * Math.cos(Topo_HA_rad)) ;
-//		var Alt_Airless_deg      = degrees(Alt_rad) ;
-//		var Zenith_deg           = 90.0 - Alt_Airless_deg ;
+	var Alt_rad              = Math.asin(Math.sin(Topo_Lat_rad) * Math.sin(Topo_Decl_rad) + Math.cos(Topo_Lat_rad) * Math.cos(Topo_Decl_rad) * Math.cos(Topo_HA_rad)) ;
+	//		var Alt_Airless_deg      = degrees(Alt_rad) ;
+	//		var Zenith_deg           = 90.0 - Alt_Airless_deg ;
 
-		var cos_Azim             = ( Math.sin(Topo_Decl_rad) - Math.sin(Alt_rad) * Math.sin(Topo_Lat_rad) ) / ( Math.cos(Alt_rad) * Math.cos(Topo_Lat_rad)) ;
-		var sin_Azim             = - Math.cos(Topo_Decl_rad) * Math.sin(Topo_HA_rad)                        /   Math.cos(Alt_rad) ;
-		var Azim_rad             = Math.atan2(sin_Azim, cos_Azim) ;
-		var Azim_deg             = degrees(Azim_rad) % 360 ;
-		if (Azim_deg < 0) {Azim_deg = Azim_deg + 360.0;}
-	
+	var cos_Azim             = ( Math.sin(Topo_Decl_rad) - Math.sin(Alt_rad) * Math.sin(Topo_Lat_rad) ) / ( Math.cos(Alt_rad) * Math.cos(Topo_Lat_rad)) ;
+	var sin_Azim             = - Math.cos(Topo_Decl_rad) * Math.sin(Topo_HA_rad)                        /   Math.cos(Alt_rad) ;
+	var Azim_rad             = Math.atan2(sin_Azim, cos_Azim) ;
+	var Azim_deg             = degrees(Azim_rad) % 360 ;
+	if (Azim_deg < 0) {Azim_deg = Azim_deg + 360.0;}
+
 	// ***************************************************************************************************
 	//GET REFRACTION CORRECTION
 	//Reference: Astronomical Algorithms 2nd Edition 1998 by Jean Meeus - Page 106 - 107
-//		var refr                 = (1.02 / Math.tan(radians(Alt_Airless_deg + 10.3 / (Alt_Airless_deg + 5.11)))) / 60.0 ;
-//		var Refraction_deg       = refr * Pressure * 283 / (Pressure * (273 + Temperature)) ;
-//		if (Alt_Airless_deg > 89) {Refraction_deg = 0;}
+	//		var refr                 = (1.02 / Math.tan(radians(Alt_Airless_deg + 10.3 / (Alt_Airless_deg + 5.11)))) / 60.0 ;
+	//		var Refraction_deg       = refr * Pressure * 283 / (Pressure * (273 + Temperature)) ;
+	//		if (Alt_Airless_deg > 89) {Refraction_deg = 0;}
 
 	// ***************************************************************************************************
 	//GET REFRACTION CORRECTED ALTITUDE OF SUN
 	//Reference: Astronomical Algorithms 2nd Edition 1998 by Jean Meeus - Page 105
-//		var Alt_Refrac_deg       = Alt_Airless_deg + Refraction_deg ;
-//		if (Alt_Refrac_deg < 0)    {Alt_Refrac_deg = 9999.0 ;}
-  return Topo_EoT_min;
+	//		var Alt_Refrac_deg       = Alt_Airless_deg + Refraction_deg ;
+	//		if (Alt_Refrac_deg < 0)    {Alt_Refrac_deg = 9999.0 ;}
+	return Topo_EoT_min;
 }
