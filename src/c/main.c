@@ -4,7 +4,6 @@
 #include "cible_localisation.h"
 #include "batterie.h"
 
-// Essai de pull avec CloudPebble
 static Window    *s_main_window;
 static TextLayer *s_date_layer;
 static TextLayer *s_time_layer;
