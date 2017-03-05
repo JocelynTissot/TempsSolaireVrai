@@ -5,11 +5,13 @@
     "name": "temps-solaire-vrai",
     "pebble": {
         "capabilities": [
-            "location"
+            "location",
+            "configurable"
         ],
         "displayName": "Temps Solaire Vrai",
         "enableMultiJS": false,
         "messageKeys": {
+            "BackgroundColor": 60,
             "corr_eot": 45,
             "longitude": 2,
             "time_zone": 43,
