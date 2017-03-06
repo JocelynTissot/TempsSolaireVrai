@@ -7,16 +7,16 @@
     <input id='background_color_input' type='text' value='#000000'>
       Background Color
     </input>
-    <input id='foreground_color_input' type='text' value='#000000'>
-      Foreground Color
-    </input>
-    <input id='second_tick_checkbox' type='checkbox'>
-      Enable Second Ticks
-    </input>
-    <input id='animations_checkbox' type='checkbox'>
-      Show Animations
-    </input>
-    <input id='submit_button' type='button' value='Save'>
+    //<input id='foreground_color_input' type='text' value='#000000'>
+    //  Foreground Color
+    //</input>
+    //<input id='second_tick_checkbox' type='checkbox'>
+    //  Enable Second Ticks
+    //</input>
+    //<input id='animations_checkbox' type='checkbox'>
+    //  Show Animations
+    //</input>
+    //<input id='submit_button' type='button' value='Save'>
     <script>
   // Get a handle to the button's HTML element
   var submitButton = document.getElementById('submit_button');
@@ -25,16 +25,16 @@
   submitButton.addEventListener('click', function() {
     // Get the config data from the UI elements
     var backgroundColor = document.getElementById('background_color_input');
-    var foregroundColor = document.getElementById('foreground_color_input');
-    var secondTickCheckbox = document.getElementById('second_tick_checkbox');
-    var animationsCheckbox = document.getElementById('animations_checkbox');
+    //var foregroundColor = document.getElementById('foreground_color_input');
+    //var secondTickCheckbox = document.getElementById('second_tick_checkbox');
+    //var animationsCheckbox = document.getElementById('animations_checkbox');
 
     // Make a data object to be sent, coercing value types to integers
     var options = {
       'background_color': parseInt(backgroundColor.value, 16),
-      'foreground_color': parseInt(foregroundColor.value, 16),
-      'second_ticks': secondTickCheckbox.checked == 'true' ? 1 : 0,
-      'animations': animationsCheckbox.checked == 'true' ? 1 : 0
+      //'foreground_color': parseInt(foregroundColor.value, 16),
+      //'second_ticks': secondTickCheckbox.checked == 'true' ? 1 : 0,
+      //'animations': animationsCheckbox.checked == 'true' ? 1 : 0
     };
 
     // Determine the correct return URL (emulator vs real watch)
