@@ -17,6 +17,7 @@ var lastLatitude;
 var lastLongitude;
 var last_corr_eotd;
 var lastSend;
+var bg_color;
 // There are two cases when data is sent to watch:
 // 1. On application startup. If location service is not available cached location is used.
 // 2. Periodic update. Data is sent only if location is available and location has changed considerably
@@ -74,6 +75,9 @@ function sendToWatch() {
 	time_Zone();  
 	//console.log("  latitude = " + latitude);
 	console.log("  longitude = " + longitude);
+	//test******************************************************************************************************
+	//bg_color = 0x000000;
+	//**********************************************************************************************************
 	/*if (Math.abs(latitude - lastLatitude) > 0.0001 || Math.abs(longitude - lastLongitude) > 0.0001) { */
 	Pebble.sendAppMessage( 
 			{ 
@@ -82,6 +86,7 @@ function sendToWatch() {
 				"timezoneOffset" : offsetTZ,
 				"time_zone"      : timeZone,
 				"corr_eot"       : corr_eotd * 1000000,
+				//"backGroundColor": bg_color,
 			},
 
 			function(e) { console.log("Successfully delivered message with transactionId="   + e.data.transactionId); },
