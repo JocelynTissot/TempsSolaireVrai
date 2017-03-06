@@ -247,7 +247,8 @@ enum {
 	LONGITUDE = 2,
 	OFFSET_TIMEZONE = 42, 
 	TIME_ZONE = 43,  
-	CORR_EOT = 45
+	CORR_EOT = 45,
+	BACKGROUNDCOLOR = 60
 };
 
 void in_received_handler(DictionaryIterator *received, void *ctx) {
