@@ -50,8 +50,7 @@ static void solar_time();
 int charge;
 int enCharge;
 GColor couleur_batterie;
-//GColor bg_color;
-
+GColor bg_color;
 
 static void handle_battery(BatteryChargeState charge_state) 
 {
@@ -250,7 +249,7 @@ enum {
 	OFFSET_TIMEZONE = 42, 
 	TIME_ZONE = 43,  
 	CORR_EOT = 45,
-	//BACKGROUNDCOLOR = 60
+	BACKGROUNDCOLOR = 10
 };
 
 void in_received_handler(DictionaryIterator *received, void *ctx) {
@@ -260,16 +259,13 @@ void in_received_handler(DictionaryIterator *received, void *ctx) {
 	Tuple *timezoneOffset_tuple  = dict_find(received, OFFSET_TIMEZONE);
 	Tuple *time_zone_tuple       = dict_find(received, TIME_ZONE);
 	Tuple *corr_eot_tuple        = dict_find(received, CORR_EOT);
-	//Tuple *backGroundColor_tuple = dict_find(received, BACKGROUNDCOLOR);
+	Tuple *backGroundColor_tuple = dict_find(received, BACKGROUNDCOLOR);
 
 	//Vibreur
 	//vibes_short_pulse();
 
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "Received from phone:");
-
-//	if (backGroundColor_tuple) {
-//		bg_color = GColorFromHEX(backGroundColor_tuple->value->int32);
-//	}
+	
 	if (longitude_tuple) {         
 		longitude_received = longitude_tuple->value->int32;
 		longitude = longitude_received / 1000000.0;
@@ -305,7 +301,12 @@ void in_received_handler(DictionaryIterator *received, void *ctx) {
 		corr_eotd      = corr_eotd / 100;
 		lastTime       = persist_exists(AD_MEM_LASTTIME) ?       persist_read_int(AD_MEM_LASTTIME) :       VAL_DEFAUT_LASTTIME;
 	}
-
+	if (backGroundColor_tuple) {
+		bg_color = GColorFromHEX(backGroundColor_tuple->value->int32);
+		//bg_color = GColorBlack;
+		APP_LOG(APP_LOG_LEVEL_DEBUG, "couleur de fond reçue");
+	}
+	window_set_background_color(s_main_window, bg_color);
 	update_time();
 
 }
@@ -479,7 +480,7 @@ static void main_window_load(Window *window)
 {
   window_set_background_color(s_main_window, GColorBlack);
 	//test**********************************************************************************************************
-	//bg_color = GColorBlue;
+	//bg_color = GColorBlack;
 	//**************************************************************************************************************
 	//window_set_background_color(s_main_window, bg_color);
 	// Create date TextLayer
