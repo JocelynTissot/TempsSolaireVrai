@@ -1,6 +1,5 @@
-# Temps Solaire Vrai
-
-[link](https://jocelyntissot.github.io/TempsSolaireVrai/watch-config.html)
+### lien pour la page de configuration
+[watch-config.html](https://jocelyntissot.github.io/TempsSolaireVrai/watch-config.html)
 
 ## Welcome to GitHub Pages
 
