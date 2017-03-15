@@ -51,6 +51,8 @@ int charge;
 int enCharge;
 GColor couleur_batterie;
 GColor bg_color;
+GColor text_color;
+bool blackOnWhite = true;
 
 static void handle_battery(BatteryChargeState charge_state) 
 {
@@ -97,8 +99,15 @@ static void dessin(Layer *layer, GContext *ctx)
 {
 	int angle;
 	(posAJour < 2) ? (angle = 0) : ((posAJour > 12) ? (angle = 360) : (angle = posAJour * 30));
-	cible_localisation(ctx, 118, 2, angle, couleur_cible_loc);
-	batterie(ctx, 10, 5, couleur_batterie, charge, enCharge);
+	#ifdef PBL_COLOR
+		cible_localisation(ctx, 118, 2, angle, couleur_cible_loc);
+		batterie(ctx, 10, 5, couleur_batterie, charge, enCharge);
+	#else
+		(blackOnWhite == 1) ?  (couleur_cible_loc = GColorBlack) : (couleur_cible_loc = GColorWhite);
+		cible_localisation(ctx, 118, 2, angle, couleur_cible_loc);
+		(blackOnWhite == 1) ?  (couleur_batterie = GColorBlack) : (couleur_batterie = GColorWhite);
+		batterie(ctx, 10, 5, couleur_batterie, charge, enCharge);
+	#endif
 }
 
 static void affichage()
@@ -302,12 +311,13 @@ void in_received_handler(DictionaryIterator *received, void *ctx) {
 		lastTime       = persist_exists(AD_MEM_LASTTIME) ?       persist_read_int(AD_MEM_LASTTIME) :       VAL_DEFAUT_LASTTIME;
 	}
 	if (backGroundColor_tuple) {
-		bg_color = GColorFromHEX(backGroundColor_tuple->value->int32);
+		//bg_color = GColorFromHEX(backGroundColor_tuple->value->int32);
 		//bg_color = GColorBlack;
 		APP_LOG(APP_LOG_LEVEL_DEBUG, "couleur de fond reçue");
 	}
-	window_set_background_color(s_main_window, bg_color);
+	//window_set_background_color(s_main_window, bg_color);
 	update_time();
+	//affichage();
 
 }
 
@@ -478,25 +488,26 @@ static void solar_time(){
 
 static void main_window_load(Window *window) 
 {
-  window_set_background_color(s_main_window, GColorBlack);
-	//test**********************************************************************************************************
-	//bg_color = GColorBlack;
-	//**************************************************************************************************************
-	//window_set_background_color(s_main_window, bg_color);
+  //window_set_background_color(s_main_window, GColorBlack);
+	(blackOnWhite == 1) ?  (bg_color = GColorWhite) : (bg_color = GColorBlack);
+	window_set_background_color(s_main_window, bg_color);
 	// Create date TextLayer
 	s_date_layer = text_layer_create(GRect(0, -2, 144, 24));
 	text_layer_set_background_color(s_date_layer, GColorClear);
+	(blackOnWhite == 1) ?  (text_color = GColorBlack) : (text_color = GColorWhite);
 #ifdef PBL_COLOR
 	text_layer_set_text_color(s_date_layer, GColorCadetBlue);
 #else
 	text_layer_set_text_color(s_date_layer, GColorWhite);
+	text_layer_set_text_color(s_date_layer, text_color);
 #endif
 	text_layer_set_text(s_date_layer, "--.--.----");
 
 	// Create time TextLayer
 	s_time_layer = text_layer_create(GRect(0, 15, 144, 28));
 	text_layer_set_background_color(s_time_layer, GColorClear);
-	text_layer_set_text_color(s_time_layer, GColorWhite);
+	//text_layer_set_text_color(s_time_layer, GColorWhite);
+	text_layer_set_text_color(s_time_layer, text_color);
 	text_layer_set_text(s_time_layer, "--:--");
 
 	// Create gmtime TextLayer
@@ -505,7 +516,8 @@ static void main_window_load(Window *window)
 #ifdef PBL_COLOR
 	text_layer_set_text_color(s_gmtime_layer, GColorCadetBlue);
 #else
-	text_layer_set_text_color(s_gmtime_layer, GColorWhite);
+	//text_layer_set_text_color(s_gmtime_layer, GColorWhite);
+	text_layer_set_text_color(s_gmtime_layer, text_color);
 #endif
 	text_layer_set_text(s_gmtime_layer, "GMT  --:--");
 
@@ -515,7 +527,8 @@ static void main_window_load(Window *window)
 #ifdef PBL_COLOR
 	text_layer_set_text_color(s_text_solar_layer, GColorYellow);
 #else
-	text_layer_set_text_color(s_text_solar_layer, GColorWhite);
+	//text_layer_set_text_color(s_text_solar_layer, GColorWhite);
+	text_layer_set_text_color(s_text_solar_layer, text_color);
 #endif
 	text_layer_set_text(s_text_solar_layer, "Temps solaire vrai");
 
@@ -525,7 +538,8 @@ static void main_window_load(Window *window)
 #ifdef PBL_COLOR
 	text_layer_set_text_color(s_solar_layer, GColorYellow);
 #else
-	text_layer_set_text_color(s_solar_layer, GColorWhite);
+	//text_layer_set_text_color(s_solar_layer, GColorWhite);
+	text_layer_set_text_color(s_solar_layer, text_color);
 #endif
 	text_layer_set_text(s_solar_layer, "--:--");
 
@@ -535,7 +549,8 @@ static void main_window_load(Window *window)
 #ifdef PBL_COLOR
 	text_layer_set_text_color(s_text_longitude_difference_layer, GColorGreen);
 #else
-	text_layer_set_text_color(s_text_longitude_difference_layer, GColorWhite);
+	//text_layer_set_text_color(s_text_longitude_difference_layer, GColorWhite);
+	text_layer_set_text_color(s_text_longitude_difference_layer, text_color);
 #endif
 	text_layer_set_text(s_text_longitude_difference_layer, "Différence de long.");
 
@@ -545,7 +560,8 @@ static void main_window_load(Window *window)
 #ifdef PBL_COLOR
 	text_layer_set_text_color(s_longitude_difference_h_layer, GColorGreen);
 #else
-	text_layer_set_text_color(s_longitude_difference_h_layer, GColorWhite);
+	//text_layer_set_text_color(s_longitude_difference_h_layer, GColorWhite);
+	text_layer_set_text_color(s_longitude_difference_h_layer, text_color);
 #endif
 	text_layer_set_text(s_longitude_difference_h_layer, "---h --m --s");
 
@@ -555,7 +571,8 @@ static void main_window_load(Window *window)
 #ifdef PBL_COLOR
 	text_layer_set_text_color(s_longitude_difference_d_layer, GColorGreen);
 #else
-	text_layer_set_text_color(s_longitude_difference_d_layer, GColorWhite);
+	//text_layer_set_text_color(s_longitude_difference_d_layer, GColorWhite);
+	text_layer_set_text_color(s_longitude_difference_d_layer, text_color);
 #endif
 	text_layer_set_text(s_longitude_difference_d_layer, "---° --m --s");
 
@@ -565,7 +582,8 @@ static void main_window_load(Window *window)
 #ifdef PBL_COLOR
 	text_layer_set_text_color(s_text_eot_layer, GColorBrilliantRose);
 #else
-	text_layer_set_text_color(s_text_eot_layer, GColorWhite);
+	//text_layer_set_text_color(s_text_eot_layer, GColorWhite);
+	text_layer_set_text_color(s_text_eot_layer, text_color);
 #endif
 	text_layer_set_text(s_text_eot_layer, "Equation du temps");
 
@@ -575,7 +593,8 @@ static void main_window_load(Window *window)
 #ifdef PBL_COLOR
 	text_layer_set_text_color(s_eot_layer, GColorBrilliantRose);
 #else
-	text_layer_set_text_color(s_eot_layer, GColorWhite);
+	//text_layer_set_text_color(s_eot_layer, GColorWhite);
+	text_layer_set_text_color(s_eot_layer, text_color);
 #endif
 	text_layer_set_text(s_eot_layer, "---m --s");
 

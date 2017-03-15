@@ -11,11 +11,11 @@ void batterie(GContext *ctx, int16_t x, int16_t y, GColor couleur, int charge, i
 	uint8_t epaisseurTrait;
 
 	/* Définir la couleur de la ligne */
-#ifdef PBL_COLOR
+//#ifdef PBL_COLOR
 	graphics_context_set_stroke_color(ctx, couleur);
-#else
-	graphics_context_set_stroke_color(ctx, GColorWhite);
-#endif
+//#else
+//	graphics_context_set_stroke_color(ctx, GColorWhite);
+//#endif
 
 	/* Défini la largeur des lignes */
 	epaisseurTrait = 1;
