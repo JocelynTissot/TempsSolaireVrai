@@ -48,7 +48,7 @@
     var return_to = getQueryParam('return_to', 'pebblejs://close#');
 
     // Encode and send the data when the page closes
-    document.location = return_to + encodeURIComponent(JSON.stringify('blackonwhite': blackOnWhiteCheckbox.checked == 'true' ? 1 : 0/*options*/));
+    document.location = return_to + encodeURIComponent(JSON.stringify('blackonwhite': blackOnWhiteCheckbox.checked == 'true' ? 1 : 0));
   });
 </script>
 
