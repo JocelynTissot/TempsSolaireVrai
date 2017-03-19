@@ -30,7 +30,7 @@
     // Make a data object to be sent, coercing value types to integers
     var options = {
       'background_color': parseInt(backgroundColor.value, 16),
-      'blackonwhite': blackOnWhiteCheckbox.checked == 'True' ? 1 : 0  
+      'blackonwhite': (blackOnWhiteCheckbox.checked == 0) ? 1 : 0  
     };
 
     // Determine the correct return URL (emulator vs real watch)
