@@ -28,10 +28,10 @@
     var blackOnWhiteCheckbox = document.getElementById('blackOnWhite_checkbox');
 
     // Make a data object to be sent, coercing value types to integers
-    //var options = {
-      //'background_color': parseInt(backgroundColor.value, 16),
-      //'blackonwhite': blackOnWhiteCheckbox.checked == 'true' ? 1 : 0  
-    //};
+    var options = {
+      'background_color': (parseInt(backgroundColor.value, 16)),
+      'blackonwhite': (blackOnWhiteCheckbox.checked == 'true' ? 1 : 0)  
+    };
 
     // Determine the correct return URL (emulator vs real watch)
     function getQueryParam(variable, defaultValue) {
@@ -48,7 +48,7 @@
     var return_to = getQueryParam('return_to', 'pebblejs://close#');
 
     // Encode and send the data when the page closes
-    document.location = return_to + encodeURIComponent(JSON.stringify('blackonwhite': blackOnWhiteCheckbox.checked == 'true' ? 1 : 0));
+    document.location = return_to + encodeURIComponent(JSON.stringify(options));
   });
 </script>
 
