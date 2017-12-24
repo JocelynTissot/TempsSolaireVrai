@@ -11,7 +11,8 @@
         "displayName": "Temps Solaire Vrai",
         "enableMultiJS": false,
         "messageKeys": {
-            "BackgroundColor": 60,
+            "BackgroundColor": 10,
+            "BlackOnWhite": 11,
             "corr_eot": 45,
             "longitude": 2,
             "time_zone": 43,

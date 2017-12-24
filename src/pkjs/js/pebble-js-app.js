@@ -17,6 +17,7 @@ var lastLatitude;
 var lastLongitude;
 var last_corr_eotd;
 var lastSend;
+
 // There are two cases when data is sent to watch:
 // 1. On application startup. If location service is not available cached location is used.
 // 2. Periodic update. Data is sent only if location is available and location has changed considerably
@@ -81,7 +82,7 @@ function sendToWatch() {
 				"longitude"      : longitude * 1000000,
 				"timezoneOffset" : offsetTZ,
 				"time_zone"      : timeZone,
-				"corr_eot"       : corr_eotd * 1000000,
+				"corr_eot"       : corr_eotd * 1000000
 			},
 
 			function(e) { console.log("Successfully delivered message with transactionId="   + e.data.transactionId); },
@@ -803,3 +804,38 @@ function Sunpos()
 	//		if (Alt_Refrac_deg < 0)    {Alt_Refrac_deg = 9999.0 ;}
 	return Topo_EoT_min;
 }
+
+
+//******************************************************************************************************************
+//******************************************************************************************************************
+
+
+
+Pebble.addEventListener('showConfiguration', function() {
+  var url = 'https://jocelyntissot.github.io/TempsSolaireVrai/watch-config.html';
+  Pebble.openURL(url);
+
+});
+
+Pebble.addEventListener('webviewclosed', function(e) {
+  // Decode the user's preferences
+  var configData = JSON.parse(decodeURIComponent(e.response));
+	//var configData = JSON.parse(e.response);
+	
+	 //Send to the watchapp via AppMessage
+var dict = {
+  'BackgroundColor': configData.background_color,
+  //'ForegroundColor': configData.foreground_color,
+  'BlackOnWhite': configData.blackonwhite
+};
+	console.log(configData.background_color);
+	console.log(configData.blackonwhite);
+
+// Send to the watchapp
+	Pebble.sendAppMessage(dict, function() {
+  console.log('Config data sent successfully!');
+}, function(e) {
+  console.log('Error sending config data!');
+});
+});
+

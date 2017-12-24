@@ -47,9 +47,13 @@ static void affichage();
 static void eot();
 static void long_dif();
 static void solar_time();
+static void init();
 int charge;
 int enCharge;
 GColor couleur_batterie;
+GColor bg_color, date_color, time_color, utc_color, solar_color, long_dif_color, eot_color;
+GColor bw_text_color;
+bool blackOnWhite = true;
 
 static void handle_battery(BatteryChargeState charge_state) 
 {
@@ -96,8 +100,15 @@ static void dessin(Layer *layer, GContext *ctx)
 {
 	int angle;
 	(posAJour < 2) ? (angle = 0) : ((posAJour > 12) ? (angle = 360) : (angle = posAJour * 30));
-	cible_localisation(ctx, 118, 2, angle, couleur_cible_loc);
-	batterie(ctx, 10, 5, couleur_batterie, charge, enCharge);
+	#ifdef PBL_COLOR
+		cible_localisation(ctx, 118, 2, angle, couleur_cible_loc);
+		batterie(ctx, 10, 5, couleur_batterie, charge, enCharge);
+	#else
+		(blackOnWhite == 1) ?  (couleur_cible_loc = GColorBlack) : (couleur_cible_loc = GColorWhite);
+		cible_localisation(ctx, 118, 2, angle, couleur_cible_loc);
+		(blackOnWhite == 1) ?  (couleur_batterie = GColorBlack) : (couleur_batterie = GColorWhite);
+		batterie(ctx, 10, 5, couleur_batterie, charge, enCharge);
+	#endif
 }
 
 static void affichage()
@@ -248,22 +259,25 @@ enum {
 	OFFSET_TIMEZONE = 42, 
 	TIME_ZONE = 43,  
 	CORR_EOT = 45,
-	BACKGROUNDCOLOR = 60
+	BACKGROUNDCOLOR = 10,
+	BLACKONWHITE = 11
 };
 
 void in_received_handler(DictionaryIterator *received, void *ctx) {
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "in_received_handler()");
 
-	Tuple *longitude_tuple       = dict_find(received, LONGITUDE);
-	Tuple *timezoneOffset_tuple  = dict_find(received, OFFSET_TIMEZONE);
-	Tuple *time_zone_tuple       = dict_find(received, TIME_ZONE);
-	Tuple *corr_eot_tuple        = dict_find(received, CORR_EOT);
+	Tuple *longitude_tuple				= dict_find(received, LONGITUDE);
+	Tuple *timezoneOffset_tuple  	= dict_find(received, OFFSET_TIMEZONE);
+	Tuple *time_zone_tuple       	= dict_find(received, TIME_ZONE);
+	Tuple *corr_eot_tuple        	= dict_find(received, CORR_EOT);
+	Tuple *backGroundColor_tuple 	= dict_find(received, BACKGROUNDCOLOR);
+	Tuple *blackOnWhite_tuple 	 	= dict_find(received, BLACKONWHITE);
 
 	//Vibreur
 	//vibes_short_pulse();
 
 	APP_LOG(APP_LOG_LEVEL_DEBUG, "Received from phone:");
-
+	
 	if (longitude_tuple) {         
 		longitude_received = longitude_tuple->value->int32;
 		longitude = longitude_received / 1000000.0;
@@ -299,9 +313,17 @@ void in_received_handler(DictionaryIterator *received, void *ctx) {
 		corr_eotd      = corr_eotd / 100;
 		lastTime       = persist_exists(AD_MEM_LASTTIME) ?       persist_read_int(AD_MEM_LASTTIME) :       VAL_DEFAUT_LASTTIME;
 	}
-
+	if (backGroundColor_tuple || blackOnWhite_tuple) {
+		bg_color = GColorFromHEX(backGroundColor_tuple->value->int32);
+		APP_LOG(APP_LOG_LEVEL_DEBUG, "couleur de fond reçue");
+		
+		if (blackOnWhite_tuple) {
+			blackOnWhite = blackOnWhite_tuple->value->int32 == 1;
+		}
+		init();
+	}
+	
 	update_time();
-
 }
 
 void in_dropped_handler(AppMessageResult reason, void *context) {
@@ -471,22 +493,33 @@ static void solar_time(){
 
 static void main_window_load(Window *window) 
 {
-	window_set_background_color(s_main_window, GColorBlack);
+	bg_color  = GColorBlack;
+#ifdef PBL_BW
+  //window_set_background_color(s_main_window, GColorBlack);
+	(blackOnWhite == 1) ?  (bg_color = GColorWhite) : (bg_color = GColorBlack);
+#endif
+	window_set_background_color(s_main_window, bg_color);
 	// Create date TextLayer
 	s_date_layer = text_layer_create(GRect(0, -2, 144, 24));
 	text_layer_set_background_color(s_date_layer, GColorClear);
+	(blackOnWhite == 1) ?  (bw_text_color = GColorBlack) : (bw_text_color = GColorWhite);
 #ifdef PBL_COLOR
 	text_layer_set_text_color(s_date_layer, GColorCadetBlue);
 #else
-	text_layer_set_text_color(s_date_layer, GColorWhite);
+	//text_layer_set_text_color(s_date_layer, GColorWhite);
+	text_layer_set_text_color(s_date_layer, bw_text_color);
 #endif
-	text_layer_set_text(s_date_layer, "--.--.----");
+	text_layer_set_text(s_date_layer, "");
 
 	// Create time TextLayer
 	s_time_layer = text_layer_create(GRect(0, 15, 144, 28));
 	text_layer_set_background_color(s_time_layer, GColorClear);
+#ifdef PBL_COLOR
 	text_layer_set_text_color(s_time_layer, GColorWhite);
-	text_layer_set_text(s_time_layer, "--:--");
+#else
+	text_layer_set_text_color(s_time_layer, bw_text_color);
+#endif
+	text_layer_set_text(s_time_layer, "");
 
 	// Create gmtime TextLayer
 	s_gmtime_layer = text_layer_create(GRect(0, 46, 144, 18));
@@ -494,9 +527,10 @@ static void main_window_load(Window *window)
 #ifdef PBL_COLOR
 	text_layer_set_text_color(s_gmtime_layer, GColorCadetBlue);
 #else
-	text_layer_set_text_color(s_gmtime_layer, GColorWhite);
+	//text_layer_set_text_color(s_gmtime_layer, GColorWhite);
+	text_layer_set_text_color(s_gmtime_layer, bw_text_color);
 #endif
-	text_layer_set_text(s_gmtime_layer, "GMT  --:--");
+	text_layer_set_text(s_gmtime_layer, "");
 
 	// Create solar_text TextLayer
 	s_text_solar_layer = text_layer_create(GRect(0, 56, 144, 20));
@@ -504,9 +538,10 @@ static void main_window_load(Window *window)
 #ifdef PBL_COLOR
 	text_layer_set_text_color(s_text_solar_layer, GColorYellow);
 #else
-	text_layer_set_text_color(s_text_solar_layer, GColorWhite);
+	//text_layer_set_text_color(s_text_solar_layer, GColorWhite);
+	text_layer_set_text_color(s_text_solar_layer, bw_text_color);
 #endif
-	text_layer_set_text(s_text_solar_layer, "Temps solaire vrai");
+	text_layer_set_text(s_text_solar_layer, "");
 
 	// Create solar TextLayer
 	s_solar_layer = text_layer_create(GRect(0, 68, 144, 24));
@@ -514,9 +549,10 @@ static void main_window_load(Window *window)
 #ifdef PBL_COLOR
 	text_layer_set_text_color(s_solar_layer, GColorYellow);
 #else
-	text_layer_set_text_color(s_solar_layer, GColorWhite);
+	//text_layer_set_text_color(s_solar_layer, GColorWhite);
+	text_layer_set_text_color(s_solar_layer, bw_text_color);
 #endif
-	text_layer_set_text(s_solar_layer, "--:--");
+	text_layer_set_text(s_solar_layer, "");
 
 	// Create text_longitude_difference TextLayer
 	s_text_longitude_difference_layer = text_layer_create(GRect(0, 90, 144, 21));
@@ -524,9 +560,10 @@ static void main_window_load(Window *window)
 #ifdef PBL_COLOR
 	text_layer_set_text_color(s_text_longitude_difference_layer, GColorGreen);
 #else
-	text_layer_set_text_color(s_text_longitude_difference_layer, GColorWhite);
+	//text_layer_set_text_color(s_text_longitude_difference_layer, GColorWhite);
+	text_layer_set_text_color(s_text_longitude_difference_layer, bw_text_color);
 #endif
-	text_layer_set_text(s_text_longitude_difference_layer, "Différence de long.");
+	text_layer_set_text(s_text_longitude_difference_layer, "");
 
 	// Create longitude_difference_h TextLayer
 	s_longitude_difference_h_layer = text_layer_create(GRect(-2, 108, 77, 18));
@@ -534,9 +571,10 @@ static void main_window_load(Window *window)
 #ifdef PBL_COLOR
 	text_layer_set_text_color(s_longitude_difference_h_layer, GColorGreen);
 #else
-	text_layer_set_text_color(s_longitude_difference_h_layer, GColorWhite);
+	//text_layer_set_text_color(s_longitude_difference_h_layer, GColorWhite);
+	text_layer_set_text_color(s_longitude_difference_h_layer, bw_text_color);
 #endif
-	text_layer_set_text(s_longitude_difference_h_layer, "---h --m --s");
+	text_layer_set_text(s_longitude_difference_h_layer, "");
 
 	// Create longitude_difference_d TextLayer
 	s_longitude_difference_d_layer = text_layer_create(GRect(70, 108, 77, 18));
@@ -544,9 +582,10 @@ static void main_window_load(Window *window)
 #ifdef PBL_COLOR
 	text_layer_set_text_color(s_longitude_difference_d_layer, GColorGreen);
 #else
-	text_layer_set_text_color(s_longitude_difference_d_layer, GColorWhite);
+	//text_layer_set_text_color(s_longitude_difference_d_layer, GColorWhite);
+	text_layer_set_text_color(s_longitude_difference_d_layer, bw_text_color);
 #endif
-	text_layer_set_text(s_longitude_difference_d_layer, "---° --m --s");
+	text_layer_set_text(s_longitude_difference_d_layer, "");
 
 	// Create text_eot TextLayer
 	s_text_eot_layer = text_layer_create(GRect(0, 126, 144, 20));
@@ -554,9 +593,10 @@ static void main_window_load(Window *window)
 #ifdef PBL_COLOR
 	text_layer_set_text_color(s_text_eot_layer, GColorBrilliantRose);
 #else
-	text_layer_set_text_color(s_text_eot_layer, GColorWhite);
+	//text_layer_set_text_color(s_text_eot_layer, GColorWhite);
+	text_layer_set_text_color(s_text_eot_layer, bw_text_color);
 #endif
-	text_layer_set_text(s_text_eot_layer, "Equation du temps");
+	text_layer_set_text(s_text_eot_layer, "");
 
 	// Create eot TextLayer
 	s_eot_layer = text_layer_create(GRect(25, 144, 94, 18));
@@ -564,9 +604,10 @@ static void main_window_load(Window *window)
 #ifdef PBL_COLOR
 	text_layer_set_text_color(s_eot_layer, GColorBrilliantRose);
 #else
-	text_layer_set_text_color(s_eot_layer, GColorWhite);
+	//text_layer_set_text_color(s_eot_layer, GColorWhite);
+	text_layer_set_text_color(s_eot_layer, bw_text_color);
 #endif
-	text_layer_set_text(s_eot_layer, "---m --s");
+	text_layer_set_text(s_eot_layer, "");
 
 	// Improve the layout to be more like a watchface
 
