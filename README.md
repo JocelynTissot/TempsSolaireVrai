@@ -1,3 +1,6 @@
+Sources divers :
+http://www.precisedirections.co.uk/Sundials/
+
 ### lien pour la page de configuration
 [watch-config.html](https://jocelyntissot.github.io/TempsSolaireVrai/watch-config.html)
 
